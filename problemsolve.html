@@ -78,19 +78,51 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             padding: 30px 40px;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .side-header {
+            width: 100%;
             text-align: left;
         }
         .side-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #333;
             margin: 0;
         }
-        .side-subtitle {
-            font-size: 16px;
-            color: #555;
-            margin: 10px 0 0 0;
+        .options-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
         }
+        .option-button {
+            width: 100%;
+            padding: 15px 20px;
+            /* background-color: #FFFFFF; */ /* Removed default background */
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .option-button:hover {
+            background-color: #F7FAFC;
+            border-color: #AEE5D8;
+        }
+        /* New color classes */
+        .option-color-1 { background-color: #D6E8FF; }
+        .option-color-2 { background-color: #CFF7E4; }
+        .option-color-3 { background-color: #FFD6E0; }
+        .option-color-4 { background-color: #E5D6FF; }
+        .option-color-5 { background-color: #FFF2B3; }
+
         .back-button {
             position: absolute;
             top: 30px;
@@ -109,8 +141,8 @@
     <a href="load.html" class="back-button">돌아가기</a>
     
     <div class="instruction-container">
-        <p class="instruction-text">지문을 소리내어 읽어주세요</p>
-        <p class="sub-instruction-text">전체 지문을 보면서, 밑줄을 따라 또박또박 읽어봐요</p>
+        <p class="instruction-text">문제를 풀어보세요</p>
+        <p class="sub-instruction-text">지문을 읽고 알맞은 답을 선택해요 ✨</p>
     </div>
 
     <div class="main-content-wrapper">
@@ -126,8 +158,16 @@
             </div>
         </div>
         <div class="side-container">
-            <h2 class="side-title">소리 내어 읽어봐요</h2>
-            <p class="side-subtitle">마이크 버튼을 누르고 따라 읽으면 돼요</p>
+            <div class="side-header">
+                <h2 class="side-title">Q1. 아이들이 들은 것은 무엇이었을까요?</h2>
+            </div>
+            <div class="options-container">
+                <button class="option-button option-color-1" onclick="window.location.href='wrong.html'">1. 오답</button>
+                <button class="option-button option-color-2" onclick="window.location.href='wrong.html'">2. 오답</button>
+                <button class="option-button option-color-3" onclick="window.location.href='right.html'">3. 정답</button>
+                <button class="option-button option-color-4" onclick="window.location.href='wrong.html'">4. 오답</button>
+                <button class="option-button option-color-5" onclick="window.location.href='wrong.html'">5. 오답</button>
+            </div>
         </div>
     </div>
 
