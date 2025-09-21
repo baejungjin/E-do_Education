@@ -10,12 +10,10 @@
             font-family: sans-serif;
             text-align: center;
             margin: 0;
-            position: relative;
-            min-height: 100vh;
         }
         .instruction-container {
             padding-top: 40px;
-            padding-bottom: 20px; /* Add space so content doesn't overlap on stack */
+            padding-bottom: 20px;
         }
         .instruction-text {
             font-size: 40px;
@@ -28,12 +26,17 @@
             font-size: 18px;
             color: #555;
         }
+        .main-content-wrapper {
+            display: flex;
+            padding: 0 60px 60px 40px;
+            gap: 40px;
+            align-items: stretch;
+        }
         .passage-container {
-            position: absolute;
-            width: 850px;
+            flex-basis: 850px;
+            flex-grow: 1;
+            flex-shrink: 1;
             height: 500px;
-            left: 40px;
-            bottom: 60px;
             background-color: white;
             border-radius: 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -66,16 +69,21 @@
             color: #444;
         }
         .side-container {
-            position: absolute;
-            width: 550px;
+            flex-basis: 376px;
+            flex-grow: 1;
+            flex-shrink: 1;
             height: 500px;
-            right: 60px;
-            bottom: 60px;
             background-color: white;
             border-radius: 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             padding: 30px 40px;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .side-header {
+            width: 100%;
             text-align: left;
         }
         .side-title {
@@ -88,6 +96,48 @@
             font-size: 16px;
             color: #555;
             margin: 10px 0 0 0;
+        }
+        .mic-button {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #AEE5D8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .mic-button:hover {
+            transform: scale(1.05);
+        }
+        .mic-label {
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+            margin-top: 3px;
+        }
+        .volume-bar {
+            width: 120px;
+            height: 20px;
+            background-color: #E0E0E0;
+            border-radius: 10px;
+            margin-top: 3px;
+            overflow: hidden;
+        }
+        .volume-fill {
+            width: 30%; /* Initial fill for demonstration */
+            height: 100%;
+            background-color: #AEE5D8;
+            border-radius: 10px;
+            transition: width 0.1s linear;
+        }
+        .feedback-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 2px;
         }
         .back-button {
             position: absolute;
@@ -111,20 +161,36 @@
         <p class="sub-instruction-text">전체 지문을 보면서, 밑줄을 따라 또박또박 읽어봐요</p>
     </div>
 
-    <div class="passage-container">
-        <div class="passage-header">
-            <h2 class="passage-title">오늘의 지문</h2>
-            <hr class="divider">
+    <div class="main-content-wrapper">
+        <div class="passage-container">
+            <div class="passage-header">
+                <h2 class="passage-title">오늘의 지문</h2>
+                <hr class="divider">
+            </div>
+            <div class="passage-content">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh.</p>
+                <p>Cras ac felis adipiscing purus fermentum ornare. Mauris nonummy turpis eget felis. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus. Duis quis erat vitae risus posuere venenatis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In hac habitasse platea dictumst. In egestas, tortor eget pellentesque lacinia, sem libero volutpat magna, et bibendum ligula est vel enim. Maecenas lorem. Maecenas delor. Pellentesque sapien. Cras eleifend urna eu nulla. Ut porta diam scelerisque tortor. Praesent vitae eros. Fusce consectetuer neque eu nisl. Quisque quis justo. Sed vel lectus. Nulla in mi. Vivamus eget felis eget enim laoreet ultricies. Nullam dignissim, felis eu semper viverra, neque ligula maximus mi, vel commodo velit magna vel justo. Aliquam erat volutpat.</p>
+                <p>Integer rutrum, orci vestibulum ullamcorper ultricies, lacus quam ultricies odio, vitae placerat pede sem sit amet enim. Phasellus et lorem id felis nonummy placerat. Fusce iaculis, est quis lacinia pretium, pede metus molestie lacus, at gravida wisi ante at libero. Quisque ornare, wisi sed feugiat suscipit, nisl magna facilisis enim, id eleifend nunc wisi nec sapien. In quam. Etiam dolor quam, tincidunt a, ornare vel, cachorros vel, dolor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Ut bibendum, neque ut imperdiet laoreet, enim lacus tempus odio, eget convallis wisi enim eget quam. In menfis. Praesent turpis. Integer posuere, arcu nec faucibus fringilla, nunc est dignissim lacus, vitae semper nisl turpis vel sem. Nam lorem. In hac habitasse platea dictumst. Mauris rutrum, sem ac varius gravida, sapien dolor ullamcorper nulla, et commodo erat enim quis nulla. In sed massa. Duis imperdiet commodo dolor. Cras sodales, lorem ac bibendum iaculis, nisi eros sodales enim, vel porta lectus enim eget dolor. Duis nunc. Pellentesque sapien. Proin molestie, dolor quis egas-tas dapibus, leo quam aliquet diam, vel cursus nisi nisl sit amet tortor.</p>
+            </div>
         </div>
-        <div class="passage-content">
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh.</p>
-            <p>Cras ac felis adipiscing purus fermentum ornare. Mauris nonummy turpis eget felis. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus. Duis quis erat vitae risus posuere venenatis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In hac habitasse platea dictumst. In egestas, tortor eget pellentesque lacinia, sem libero volutpat magna, et bibendum ligula est vel enim. Maecenas lorem. Maecenas delor. Pellentesque sapien. Cras eleifend urna eu nulla. Ut porta diam scelerisque tortor. Praesent vitae eros. Fusce consectetuer neque eu nisl. Quisque quis justo. Sed vel lectus. Nulla in mi. Vivamus eget felis eget enim laoreet ultricies. Nullam dignissim, felis eu semper viverra, neque ligula maximus mi, vel commodo velit magna vel justo. Aliquam erat volutpat.</p>
-            <p>Integer rutrum, orci vestibulum ullamcorper ultricies, lacus quam ultricies odio, vitae placerat pede sem sit amet enim. Phasellus et lorem id felis nonummy placerat. Fusce iaculis, est quis lacinia pretium, pede metus molestie lacus, at gravida wisi ante at libero. Quisque ornare, wisi sed feugiat suscipit, nisl magna facilisis enim, id eleifend nunc wisi nec sapien. In quam. Etiam dolor quam, tincidunt a, ornare vel, cachorros vel, dolor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Ut bibendum, neque ut imperdiet laoreet, enim lacus tempus odio, eget convallis wisi enim eget quam. In menfis. Praesent turpis. Integer posuere, arcu nec faucibus fringilla, nunc est dignissim lacus, vitae semper nisl turpis vel sem. Nam lorem. In hac habitasse platea dictumst. Mauris rutrum, sem ac varius gravida, sapien dolor ullamcorper nulla, et commodo erat enim quis nulla. In sed massa. Duis imperdiet commodo dolor. Cras sodales, lorem ac bibendum iaculis, nisi eros sodales enim, vel porta lectus enim eget dolor. Duis nunc. Pellentesque sapien. Proin molestie, dolor quis egas-tas dapibus, leo quam aliquet diam, vel cursus nisi nisl sit amet tortor.</p>
+        <div class="side-container">
+            <div class="side-header">
+                <h2 class="side-title">소리 내어 읽어봐요</h2>
+                <p class="side-subtitle">마이크 버튼을 누르고 따라 읽으면 돼요</p>
+            </div>
+            <div class="mic-button">
+                <svg width="80" height="120" viewBox="0 0 100 150">
+                    <rect x="20" y="10" width="60" height="90" rx="30" fill="none" stroke="#10B981" stroke-width="10"></rect>
+                    <line x1="50" y1="100" x2="50" y2="140" stroke="#10B981" stroke-width="10"></line>
+                    <line x1="25" y1="140" x2="75" y2="140" stroke="#10B981" stroke-width="10" stroke-linecap="round"></line>
+                </svg>
+            </div>
+            <p class="mic-label">눌러서 녹음 시작</p>
+            <div class="volume-bar">
+                <div class="volume-fill"></div>
+            </div>
+            <p class="feedback-text">잘하고 있어요 계속 읽어볼까요?</p>
         </div>
-    </div>
-    <div class="side-container">
-        <h2 class="side-title">소리 내어 읽어봐요</h2>
-        <p class="side-subtitle">마이크 버튼을 누르고 따라 읽으면 돼요</p>
     </div>
 
 </body>
