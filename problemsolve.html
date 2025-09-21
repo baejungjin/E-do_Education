@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파일 읽기</title>
+    <style>
+        body {
+            background-color: #F7FAFC;
+            font-family: sans-serif;
+            text-align: center;
+            margin: 0;
+            position: relative;
+            min-height: 100vh;
+        }
+        .instruction-container {
+            padding-top: 40px;
+            padding-bottom: 20px; /* Add space so content doesn't overlap on stack */
+        }
+        .instruction-text {
+            font-size: 40px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        .sub-instruction-text {
+            font-size: 18px;
+            color: #555;
+        }
+        .passage-container {
+            position: absolute;
+            width: 850px;
+            height: 500px;
+            left: 40px;
+            bottom: 60px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 30px 40px;
+            box-sizing: border-box;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+        }
+        .passage-header {
+            flex-shrink: 0;
+        }
+        .passage-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .divider {
+            border: none;
+            height: 1px;
+            background-color: #E0E0E0;
+            margin: 20px 0;
+        }
+        .passage-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+        .side-container {
+            position: absolute;
+            width: 550px;
+            height: 500px;
+            right: 60px;
+            bottom: 60px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .back-button {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            padding: 10px 20px;
+            background-color: #AEE5D8;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 10px;
+            font-size: clamp(14px, 1.2vw, 16px);
+        }
+
+        /* Responsive adjustments for stacking */
+        @media (max-width: 1365px) {
+            .passage-container, .side-container {
+                position: relative;
+                width: auto;
+                height: auto;
+                left: auto;
+                right: auto;
+                bottom: auto;
+                margin: 20px 40px;
+            }
+            .passage-container {
+                min-height: 400px; /* Give it some height when stacked */
+            }
+            .side-container {
+                min-height: 300px; /* Give it some height when stacked */
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="load.html" class="back-button">돌아가기</a>
+    
+    <div class="instruction-container">
+        <p class="instruction-text">지문을 소리내어 읽어주세요</p>
+        <p class="sub-instruction-text">전체 지문을 보면서, 밑줄을 따라 또박또박 읽어봐요</p>
+    </div>
+
+    <div class="passage-container">
+        <div class="passage-header">
+            <h2 class="passage-title">오늘의 지문</h2>
+            <hr class="divider">
+        </div>
+        <div class="passage-content">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh.</p>
+            <p>Cras ac felis adipiscing purus fermentum ornare. Mauris nonummy turpis eget felis. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus. Duis quis erat vitae risus posuere venenatis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In hac habitasse platea dictumst. In egestas, tortor eget pellentesque lacinia, sem libero volutpat magna, et bibendum ligula est vel enim. Maecenas lorem. Maecenas delor. Pellentesque sapien. Cras eleifend urna eu nulla. Ut porta diam scelerisque tortor. Praesent vitae eros. Fusce consectetuer neque eu nisl. Quisque quis justo. Sed vel lectus. Nulla in mi. Vivamus eget felis eget enim laoreet ultricies. Nullam dignissim, felis eu semper viverra, neque ligula maximus mi, vel commodo velit magna vel justo. Aliquam erat volutpat.</p>
+            <p>Integer rutrum, orci vestibulum ullamcorper ultricies, lacus quam ultricies odio, vitae placerat pede sem sit amet enim. Phasellus et lorem id felis nonummy placerat. Fusce iaculis, est quis lacinia pretium, pede metus molestie lacus, at gravida wisi ante at libero. Quisque ornare, wisi sed feugiat suscipit, nisl magna facilisis enim, id eleifend nunc wisi nec sapien. In quam. Etiam dolor quam, tincidunt a, ornare vel, cachorros vel, dolor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Ut bibendum, neque ut imperdiet laoreet, enim lacus tempus odio, eget convallis wisi enim eget quam. In menfis. Praesent turpis. Integer posuere, arcu nec faucibus fringilla, nunc est dignissim lacus, vitae semper nisl turpis vel sem. Nam lorem. In hac habitasse platea dictumst. Mauris rutrum, sem ac varius gravida, sapien dolor ullamcorper nulla, et commodo erat enim quis nulla. In sed massa. Duis imperdiet commodo dolor. Cras sodales, lorem ac bibendum iaculis, nisi eros sodales enim, vel porta lectus enim eget dolor. Duis nunc. Pellentesque sapien. Proin molestie, dolor quis egestas dapibus, leo quam aliquet diam, vel cursus nisi nisl sit amet tortor.</p>
+        </div>
+    </div>
+    <div class="side-container"></div>
+
+</body>
+</html>

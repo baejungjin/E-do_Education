@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파일 불러오기</title>
+    <style>
+        body {
+            background-color: #F7FAFC;
+            font-family: sans-serif;
+            text-align: center;
+            padding: 5vh;
+            padding-bottom: 120px; 
+        }
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 5vh;
+            min-height: 150px;
+        }
+        .uploaded-file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 73.2%;
+            max-width: 1000px;
+            min-height: 13.7vh;
+            max-height: 140px;
+            background-color: white;
+            border: 1px solid #DDDDDD;
+            border-radius: 15px;
+            padding: 20px 30px;
+            box-sizing: border-box;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+        }
+        .uploaded-file-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .file-info {
+            text-align: left;
+        }
+        .file-name {
+            font-weight: bold;
+            font-size: clamp(18px, 1.5vw, 22px);
+        }
+        .file-date {
+            font-size: clamp(14px, 1.1vw, 16px);
+            color: #888;
+            margin-top: 5px;
+        }
+        .delete-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            color: #AAA;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        .upload-new-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 73.2%;
+            max-width: 1000px;
+            min-height: 7.8vh;
+            max-height: 80px;
+            height: auto;
+            background-color: #42A5F5;
+            color: white;
+            font-weight: bold;
+            font-size: clamp(18px, 1.8vw, 24px);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .upload-new-btn:hover {
+            background-color: #1E88E5;
+        }
+        .back-button {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            padding: 10px 20px;
+            background-color: #FFFFFF;
+            border: 1px solid #DDDDDD;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 10px;
+            font-size: clamp(14px, 1.2vw, 16px);
+        }
+    </style>
+</head>
+<body>
+    <a href="study.html" class="back-button">돌아가기</a>
+
+    <div class="file-list"></div>
+
+    <input type="file" id="new-file-upload" style="display: none;">
+    <label for="new-file-upload" class="upload-new-btn">+ 새 파일 업로드</label>
+
+    <template id="file-item-template">
+        <div class="uploaded-file-item">
+            <div class="file-info">
+                <div class="file-name">new_file.pdf</div>
+                <div class="file-date">업로드 날짜: 2025-09-16</div>
+            </div>
+            <button class="delete-btn">&times;</button>
+        </div>
+    </template>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileList = document.querySelector('.file-list');
+            const template = document.querySelector('#file-item-template');
+            const fileInput = document.querySelector('#new-file-upload');
+
+            function addFileToList(fileName, fileDate) {
+                const clone = template.content.cloneNode(true);
+                clone.querySelector('.file-name').textContent = fileName;
+                clone.querySelector('.file-date').textContent = `업로드 날짜: ${fileDate}`;
+                fileList.appendChild(clone);
+            }
+
+            // Main upload button adds the selected file
+            fileInput.addEventListener('change', (event) => {
+                const files = event.target.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    const today = new Date().toLocaleDateString('ko-KR');
+                    addFileToList(file.name, today);
+                    event.target.value = null;
+                }
+            });
+
+            // Delete item or navigate
+            fileList.addEventListener('click', (event) => {
+                const item = event.target.closest('.uploaded-file-item');
+                if (!item) return;
+
+                if (event.target.classList.contains('delete-btn')) {
+                    item.remove();
+                } else {
+                    window.location.href = 'read.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
