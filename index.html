@@ -3,213 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Web Page</title>
+    <title>로딩 중...</title>
     <style>
         body {
             background-color: #F7FAFC;
             font-family: sans-serif;
-            text-align: center;
-            padding-top: 5vh;
-            padding-bottom: 5vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             margin: 0;
-            display: flex;
             flex-direction: column;
-            justify-content: center;
-            min-height: 90vh;
-            box-sizing: border-box;
-        }
-
-        .content-wrapper {
-            width: 90%;
-            margin: 0 auto;
-        }
-
-        .title {
-            font-size: clamp(28px, 3.07vw, 42px);
-            font-weight: bold;
-            margin-bottom: 1.5vh;
-        }
-
-        .subtitle {
-            font-size: clamp(16px, 1.46vw, 20px);
-            margin-bottom: 4vh;
-        }
-
-        .summary-title {
-            font-size: clamp(20px, 1.75vw, 24px);
-            font-weight: bold;
-        }
-
-        .summary-box {
-            width: 80%;
-            max-width: 1000px;
-            min-height: 37vh;
-            background-color: white;
-            border-radius: 20px;
-            margin: 0 auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            margin-bottom: 4vh;
-            padding: 3vh;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3vh;
-        }
-
-        .summary-details {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-around;
-            align-items: center;
-            width: 100%;
-        }
-
-        .detail-item {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .text-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            text-align: left;
-        }
-
-        .icon-container {
-            width: 80px;
-            height: 80px;
-            flex-shrink: 0;
-        }
-
-        .detail-label {
-            font-size: clamp(14px, 1.2vw, 16px);
-            font-weight: bold;
-            color: #555;
-        }
-
-        .detail-value {
-            font-size: clamp(20px, 1.8vw, 24px);
-            font-weight: bold;
             color: #333;
         }
-
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: auto;
-            margin-right: auto;
-            width: 36.6%;
-            max-width: 500px;
-            min-height: 7.8vh;
-            max-height: 80px;
-            border-radius: 15px;
-            text-decoration: none;
-            color: #333;
+        .loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #AEE5D8;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            font-size: 24px;
             font-weight: bold;
-            font-size: clamp(16px, 1.6vw, 20px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: transform 0.2s ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-        }
-
-        .btn-start {
-            background-color: #AEE5D8;
-        }
-
-        .btn-report {
-            background-color: #FFD6E0;
-            margin-top: 1.5vh;
-        }
-
-        @media (max-width: 1200px) {
-            .summary-details {
-                flex-direction: column;
-                gap: 3vh;
-                align-items: center;
-            }
-            .detail-item{
-                width: 50%;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                justify-content: flex-start;
-            }
-            .summary-box {
-                width: 90%;
-                min-height: auto;
-                padding: 4vh 2vh;
-            }
-            .detail-item{
-                width: 80%;
-            }
-            .btn {
-                width: 70%;
-                min-height: 10vh;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="content-wrapper">
-        <div class="title">오늘은 무엇을 배워볼까요</div>
-        <div class="subtitle">따듯하게,차분하게,한 걸음씩</div>
-
-        <div class="summary-box">
-            <div class="summary-title">오늘의 요약</div>
-            <div class="summary-details">
-                <div class="detail-item">
-                    <div class="icon-container">
-                        <svg width="80" height="80" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="45" fill="#AEE5D8"/>
-                            <line x1="50" y1="50" x2="50" y2="25" stroke="white" stroke-width="6" stroke-linecap="round"/>
-                            <line x1="50" y1="50" x2="70" y2="50" stroke="white" stroke-width="6" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <div class="text-container">
-                        <div class="detail-label">공부시간</div>
-                        <div class="detail-value">-- 분</div>
-                    </div>
-                </div>
-                <div class="detail-item">
-                    <div class="icon-container">
-                        <svg width="80" height="80" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="45" fill="#FFD6E0"/>
-                            <polyline points="30,55 45,70 75,40" stroke="white" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <div class="text-container">
-                        <div class="detail-label">맞힌문제</div>
-                        <div class="detail-value">-- 개</div>
-                    </div>
-                </div>
-                <div class="detail-item">
-                    <div class="icon-container">
-                        <svg width="80" height="80" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="45" fill="#CDB4DB"/>
-                            <polyline points="30,55 45,70 75,40" stroke="white" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <div class="text-container">
-                        <div class="detail-label">복습필요</div>
-                        <div class="detail-value">-- 개</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <a href="study.html" class="btn btn-start">공부시작</a>
-        <a href="report.html" class="btn btn-report">리포트보기</a>
-    </div>
+    <script>
+        setTimeout(function() {
+            window.location.href = 'main.html';
+        }, 3000); // Redirect after 3 seconds
+    </script>
+    <div class="loader"></div>
+    <div class="loading-text">로딩 중입니다...</div>
 </body>
 </html>

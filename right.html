@@ -3,37 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>정답</title>
+    <title>읽기 완료</title>
     <style>
         body {
             background-color: #F7FAFC;
             font-family: sans-serif;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* vertically align to top */
             min-height: 100vh;
             margin: 0;
-            flex-direction: column;
+            padding: 8vh 0; /* Adjusted padding */
+            box-sizing: border-box;
         }
-        h1 {
-            font-size: clamp(32px, 4vw, 50px);
-            color: #32CD32; /* Greenish color for right */
+        .content-wrapper {
+            text-align: center;
         }
-        .back-button {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 15px 30px;
-            background-color: #CFF7E4;
-            color: #333;
-            text-decoration: none;
+        .star-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            font-size: 80px; /* Increased font size for emoji */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .main-message {
+            font-size: 44px;
             font-weight: bold;
-            border-radius: 10px;
-            font-size: clamp(16px, 1.5vw, 20px);
+            color: #333;
+            margin: 0;
+        }
+        .sub-message {
+            font-size: 20px;
+            color: #555;
+            margin: 10px 0 0 0;
+        }
+        .new-box {
+            width: 1000px;
+            height: 200px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin: 40px auto 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .box-message {
+            font-size: 26px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .action-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 1000px;
+            height: 100px;
+            background-color: #CFF7E4;
+            border-radius: 20px; /* Match the box */
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            font-size: 26px; /* Increased font size */
+            margin-top: 30px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        @media (max-width: 1080px) {
+            .new-box, .action-button {
+                width: 90vw;
+                height: auto; /* Adjust height for responsiveness */
+            }
+            .new-box {
+                 min-height: 150px;
+            }
+            .action-button {
+                min-height: 100px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>정답이에요!</h1>
-    <a href="problemsolve.html" class="back-button">다음 문제</a>
+    <div class="content-wrapper">
+        <div class="star-icon">🎉</div>
+        <h1 class="main-message">정답이에요! 잘했어요 👏</h1>
+        <p class="sub-message">ㅤ</p>
+        <div class="new-box">
+            <p class="box-message">gpt feedback</p>
+        </div>
+        <a href="problemsolve.html" class="action-button">다음 문제 풀기</a>
+    </div>
 </body>
 </html>
