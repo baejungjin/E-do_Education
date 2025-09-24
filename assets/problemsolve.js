@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${BASE_URL}/api/ocr`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fileld: id }),
+                body: JSON.stringify({ fileId: id }),
             });
             if (!response.ok) throw new Error(`서버 응답 오류: ${response.status}`);
             const result = await response.json();
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${BASE_URL}/api/quiz`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fileld: id }), // Using defaults for level/style
+                body: JSON.stringify({ fileId: id }), // Using defaults for level/style
             });
             if (!response.ok) throw new Error(`서버 응답 오류: ${response.status}`);
             const result = await response.json();

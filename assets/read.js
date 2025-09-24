@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                // API 명세에 따라 'fileld' 키로 ID를 보냅니다.
-                body: JSON.stringify({ fileld: id }),
+                // API 명세에 따라 'fileId' 키로 ID를 보냅니다.
+                body: JSON.stringify({ fileId: id }),
             });
 
             if (!response.ok) {

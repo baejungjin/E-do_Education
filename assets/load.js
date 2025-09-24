@@ -70,8 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const newFileItemFragment = fileItemTemplate.content.cloneNode(true);
         const newFileItem = newFileItemFragment.querySelector('.uploaded-file-item');
 
-        // fileId를 data 속성으로 저장합니다. API 명세에 'fileld'로 되어있으므로 그대로 사용합니다.
-        newFileItem.dataset.fileId = fileData.fileld;
+        // fileId를 data 속성으로 저장합니다.
+        newFileItem.dataset.fileId = fileData.fileId;
 
         // 복사한 아이템 안에서 클래스 이름으로 각 요소를 찾습니다.
         const fileNameElement = newFileItem.querySelector('.file-name');
