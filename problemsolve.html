@@ -4,138 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>파일 읽기</title>
-    <style>
-        body {
-            background-color: #F7FAFC;
-            font-family: sans-serif;
-            text-align: center;
-            margin: 0;
-        }
-        .instruction-container {
-            padding-top: 40px;
-            padding-bottom: 20px;
-        }
-        .instruction-text {
-            font-size: 40px;
-            font-weight: bold;
-            color: #333;
-            margin-top: 0;
-            margin-bottom: 5px;
-        }
-        .sub-instruction-text {
-            font-size: 18px;
-            color: #555;
-        }
-        .main-content-wrapper {
-            display: flex;
-            padding: 0 60px 60px 40px;
-            gap: 40px;
-            align-items: stretch;
-        }
-        .passage-container {
-            flex-basis: 850px;
-            flex-grow: 1;
-            flex-shrink: 1;
-            height: 500px;
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            padding: 30px 40px;
-            box-sizing: border-box;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-        }
-        .passage-header {
-            flex-shrink: 0;
-        }
-        .passage-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin: 0;
-        }
-        .divider {
-            border: none;
-            height: 1px;
-            background-color: #E0E0E0;
-            margin: 20px 0;
-        }
-        .passage-content {
-            flex-grow: 1;
-            overflow-y: auto;
-            font-size: 16px;
-            line-height: 1.7;
-            color: #444;
-        }
-        .side-container {
-            flex-basis: 376px;
-            flex-grow: 1;
-            flex-shrink: 1;
-            height: 500px;
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            padding: 30px 40px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .side-header {
-            width: 100%;
-            text-align: left;
-        }
-        .side-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
-            margin: 0;
-        }
-        .options-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        .option-button {
-            width: 100%;
-            padding: 15px 20px;
-            /* background-color: #FFFFFF; */ /*   Removed default background */
-            border: 1px solid #E0E0E0;
-            border-radius: 12px;
-            text-align: left;
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-        .option-button:hover {
-            background-color: #F7FAFC;
-            border-color: #AEE5D8;
-        }
-        /* New color classes */
-        .option-color-1 { background-color: #D6E8FF; }
-        .option-color-2 { background-color: #CFF7E4; }
-        .option-color-3 { background-color: #FFD6E0; }
-        .option-color-4 { background-color: #E5D6FF; }
-        .option-color-5 { background-color: #FFF2B3; }
-
-        .back-button {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            padding: 10px 20px;
-            background-color: #AEE5D8;
-            color: #333;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 10px;
-            font-size: clamp(14px, 1.2vw, 16px);
-        }
-    </style>
+    <link rel="stylesheet" href="assets/problemsolve.css">
 </head>
 <body>
     <a href="load.html" class="back-button">돌아가기</a>
@@ -171,6 +40,7 @@
         </div>
     </div>
 
+    <script src="assets/problemsolve.js" defer></script>
 </body>
 </html>
 <!-- Gemini CLI -->
