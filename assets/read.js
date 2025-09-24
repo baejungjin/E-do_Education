@@ -41,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json();
 
+            console.log('서버로부터 받은 OCR 응답:', result); // 서버 응답 전체를 로그에 출력
+
             if (result.ok) {
                 // 성공 시, 제목과 지문 내용을 업데이트합니다.
                 passageTitle.textContent = '오늘의 지문';
