@@ -2,9 +2,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const passageContent = document.querySelector('.passage-content');
     const passageTitle = document.querySelector('.passage-title');
 
+    const doneButton = document.querySelector('.done-button');
+
     // 1. URL에서 fileId를 가져옵니다.
     const urlParams = new URLSearchParams(window.location.search);
     const fileId = urlParams.get('fileId');
+
+    // "다 읽었어요" 버튼에 fileId를 추가합니다.
+    if (fileId) {
+        doneButton.href = `readwell.html?fileId=${fileId}`;
+    }
 
     const BASE_URL = 'https://e-do.onrender.com';
 
