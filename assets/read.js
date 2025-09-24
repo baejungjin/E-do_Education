@@ -53,8 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.ok) {
                 // 성공 시, 제목과 지문 내용을 업데이트합니다.
                 passageTitle.textContent = '오늘의 지문';
-                // API 응답의 'preview' 필드를 사용합니다.
-                passageContent.textContent = result.preview;
+                // API 응답의 'fullText' 필드를 사용합니다.
+                passageContent.textContent = result.fullText;
             } else {
                 // API가 ok: false를 반환한 경우
                 throw new Error(result.error || '알 수 없는 오류가 발생했습니다.');

@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             if (result.ok) {
                 passageTitle.textContent = '오늘의 지문';
-                passageContent.textContent = result.preview;
+                passageContent.textContent = result.fullText;
             } else {
                 throw new Error(result.error || '알 수 없는 오류');
             }
