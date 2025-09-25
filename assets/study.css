@@ -56,6 +56,12 @@
             background-color: #CFF7E4;
         }
 
+        .btn-add.disabled {
+            background-color: #E0E0E0;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         .back-button {
             display: inline-block;
             margin-top: 5vh;

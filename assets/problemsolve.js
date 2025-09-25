@@ -49,6 +49,27 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error(message);
     }
 
+    /**
+     * OCR 텍스트를 문단으로 변환하는 함수
+     * @param {string} text - 원본 텍스트
+     * @returns {string} HTML 형식의 문단
+     */
+    function formatOcrText(text) {
+        // 1. 모든 종류의 줄바꿈을 공백으로 변환하여 정규화합니다.
+        const singleLineText = text.replace(/(\r\n|\n|\r)/gm, " ").trim();
+
+        // 2. 텍스트를 문장 단위로 나눕니다. 이 정규식은 문장 끝 구두점(.!?) 뒤에 공백이 오거나 문자열의 끝인 경우를 찾습니다.
+        const sentences = singleLineText.match(/[^.!?]+[.!?]+(\s+|$)/g);
+
+        // 정규식이 문장을 찾지 못하면, 전체 텍스트를 하나의 <p> 태그에 넣습니다.
+        if (!sentences) {
+            return `<p>${singleLineText}</p>`;
+        }
+
+        // 3. 각 문장을 <p> 태그로 감싸고 합칩니다.
+        return sentences.map(sentence => `<p>${sentence.trim()}</p>`).join('');
+    }
+
     async function fetchOcrTextAndQuiz(id) {
         // Use Promise.all to fetch in parallel
         await Promise.all([
@@ -70,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             if (result.ok) {
                 passageTitle.textContent = '오늘의 지문';
-                passageContent.textContent = result.fullText;
+                passageContent.innerHTML = formatOcrText(result.fullText);
             } else {
                 throw new Error(result.error || '알 수 없는 오류');
             }
@@ -108,8 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayCurrentQuestion() {
         if (currentQuestionIndex >= questions.length) {
-            quizTitle.textContent = '퀴즈 완료!';
-            optionsContainer.innerHTML = '<p>모든 문제를 다 풀었습니다! 수고하셨습니다.</p><a href="main.html" class="action-button" style="text-decoration: none; display: flex; justify-content: center; align-items: center;">메인으로 돌아가기</a>';
+            window.location.href = 'solvecomplete.html';
             return;
         }
 

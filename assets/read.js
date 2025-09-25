@@ -24,6 +24,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
+     * OCR 텍스트를 문단으로 변환하는 함수
+     * @param {string} text - 원본 텍스트
+     * @returns {string} HTML 형식의 문단
+     */
+    function formatOcrText(text) {
+        // 1. 모든 종류의 줄바꿈을 공백으로 변환하여 정규화합니다.
+        const singleLineText = text.replace(/(\r\n|\n|\r)/gm, " ").trim();
+
+        // 2. 텍스트를 문장 단위로 나눕니다. 이 정규식은 문장 끝 구두점(.!?) 뒤에 공백이 오거나 문자열의 끝인 경우를 찾습니다.
+        const sentences = singleLineText.match(/[^.!?]+[.!?]+(\s+|$)/g);
+
+        // 정규식이 문장을 찾지 못하면, 전체 텍스트를 하나의 <p> 태그에 넣습니다.
+        if (!sentences) {
+            return `<p>${singleLineText}</p>`;
+        }
+
+        // 3. 각 문장을 <p> 태그로 감싸고 합칩니다.
+        return sentences.map(sentence => `<p>${sentence.trim()}</p>`).join('');
+    }
+
+    /**
      * 3. 서버에 OCR을 요청하고 결과를 받아 화면에 표시하는 함수
      * @param {string} id - 업로드된 파일의 ID
      */
@@ -53,8 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.ok) {
                 // 성공 시, 제목과 지문 내용을 업데이트합니다.
                 passageTitle.textContent = '오늘의 지문';
-                // API 응답의 'fullText' 필드를 사용합니다.
-                passageContent.textContent = result.fullText;
+                // API 응답의 'fullText' 필드를 화면에 맞게 포맷팅합니다.
+                passageContent.innerHTML = formatOcrText(result.fullText);
             } else {
                 // API가 ok: false를 반환한 경우
                 throw new Error(result.error || '알 수 없는 오류가 발생했습니다.');
