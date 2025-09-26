@@ -7,9 +7,53 @@
     <link rel="stylesheet" href="assets/report.css">
 </head>
 <body>
-    <h1>리포트 페이지</h1>
-    <p>이곳에 학습 리포트 관련 콘텐츠가 표시됩니다.</p>
-    <a href="index.html" class="back-button">돌아가기</a>
+    <h1 class="report-title">발달추이 리포트 (n~n+1주차)(예시사진 추후 개발 예정)</h1>
+    <p class="report-subtitle">최근 학습의 전반적인 흐름을 요약합니다</p>
+
+    <div class="summary-container">
+        <div class="summary-item">
+            <div class="summary-label">정답률</div>
+            <div class="summary-value">90%</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">평균학습시간</div>
+            <div class="summary-value">15:30</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">참여횟수</div>
+            <div class="summary-value">13회</div>
+        </div>
+    </div>
+
+    <div class="detail-container">
+        <div class="detail-box">
+            <h2>정답률 추이</h2>
+            <div class="chart-container">
+                <div class="bar" style="height: 75%;"><span class="bar-label">75%</span></div>
+                <div class="bar" style="height: 80%;"><span class="bar-label">80%</span></div>
+                <div class="bar" style="height: 60%;"><span class="bar-label">60%</span></div>
+                <div class="bar" style="height: 85%;"><span class="bar-label">85%</span></div>
+                <div class="bar" style="height: 90%;"><span class="bar-label">90%</span></div>
+            </div>
+        </div>
+        <div class="detail-box">
+            <h2>평균 학습 시간 추이</h2>
+            <div class="chart-container">
+                <div class="bar" style="height: 50%;"><span class="bar-label">25분</span></div>
+                <div class="bar" style="height: 60%;"><span class="bar-label">30분</span></div>
+                <div class="bar" style="height: 80%;"><span class="bar-label">40분</span></div>
+                <div class="bar" style="height: 70%;"><span class="bar-label">35분</span></div>
+                <div class="bar" style="height: 90%;"><span class="bar-label">45분</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="long-box">
+        <h2>종합 평가</h2>
+        <p>이곳에 종합 평가 내용이 표시됩니다.</p>
+    </div>
+
+    <a href="report_more_detail.html" class="detail-report-button">세부 리포트 보기</a>
+
 </body>
 </html>
-<!-- Gemini CLI -->
