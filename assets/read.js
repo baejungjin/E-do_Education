@@ -1,91 +1,230 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- 기존 OCR 관련 요소 ---
     const passageContent = document.querySelector('.passage-content');
     const passageTitle = document.querySelector('.passage-title');
+    
+    // --- 새로운 STT 관련 요소 ---
+    const micButton = document.getElementById('mic-button');
+    const sttStatus = document.getElementById('stt-status');
+    const sttPreview = document.getElementById('stt-preview');
+    const sttLog = document.getElementById('stt-log');
+    const doneButton = document.getElementById('done-button');
 
-    const doneButton = document.querySelector('.done-button');
-
-    // 1. URL에서 fileId를 가져옵니다.
-    const urlParams = new URLSearchParams(window.location.search);
-    const fileId = urlParams.get('fileId');
-
-    // "다 읽었어요" 버튼에 fileId를 추가합니다.
-    if (fileId) {
-        doneButton.href = `readwell.html?fileId=${fileId}`;
-    }
-
+    // --- 상태 변수 ---
     const BASE_URL = 'https://e-do.onrender.com';
+    const STT_URL = 'wss://e-do.onrender.com/stt';
+    let fileId = new URLSearchParams(window.location.search).get('fileId');
+    
+    let socket;
+    let mediaRecorder;
+    let mediaStream;
+    let isRecording = false;
+    let finalTranscripts = [];
 
-    // 2. fileId가 있으면 OCR API를 호출하는 함수를 실행합니다.
+    // --- 초기화 ---
     if (fileId) {
         fetchOcrText(fileId);
+        initializeMicrophone();
+        // "다 읽었어요" 버튼에 fileId 추가
+        doneButton.href = `readwell.html?fileId=${fileId}`;
     } else {
-        passageContent.textContent = '오류: 파일 ID를 찾을 수 없습니다. 이전 페이지로 돌아가 다시 시도해주세요.';
+        passageContent.textContent = '오류: 파일 ID를 찾을 수 없습니다.';
+        sttStatus.textContent = '파일 ID가 없어 시작할 수 없습니다.';
         console.error('File ID not found in URL');
     }
 
-    /**
-     * OCR 텍스트를 문단으로 변환하는 함수
-     * @param {string} text - 원본 텍스트
-     * @returns {string} HTML 형식의 문단
-     */
-    function formatOcrText(text) {
-        // 1. 모든 종류의 줄바꿈을 공백으로 변환하여 정규화합니다.
-        const singleLineText = text.replace(/(\r\n|\n|\r)/gm, " ").trim();
+    // 1. 마이크 초기화 및 권한 요청
+    async function initializeMicrophone() {
+        sttStatus.textContent = '마이크 권한을 요청합니다...';
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            sttStatus.textContent = '마이크가 준비되었습니다. 버튼을 눌러 녹음을 시작하세요.';
+            micButton.addEventListener('click', toggleRecording);
+        } catch (error) {
+            sttStatus.textContent = '마이크 권한이 거부되었습니다. 설정에서 허용해주세요.';
+            console.error('마이크 권한 오류:', error);
+        }
+    }
 
-        // 2. 텍스트를 문장 단위로 나눕니다. 이 정규식은 문장 끝 구두점(.!?) 뒤에 공백이 오거나 문자열의 끝인 경우를 찾습니다.
-        const sentences = singleLineText.match(/[^.!?]+[.!?]+(\s+|$)/g);
+    // 2. 녹음 시작/종료 토글
+    function toggleRecording() {
+        if (isRecording) {
+            stopRecording();
+        } else {
+            startRecording();
+        }
+    }
 
-        // 정규식이 문장을 찾지 못하면, 전체 텍스트를 하나의 <p> 태그에 넣습니다.
-        if (!sentences) {
-            return `<p>${singleLineText}</p>`;
+    // 3. 녹음 시작 처리
+    function startRecording() {
+        if (!mediaStream) {
+            sttStatus.textContent = '마이크를 사용할 수 없습니다.';
+            return;
         }
 
-        // 3. 각 문장을 <p> 태그로 감싸고 합칩니다.
-        return sentences.map(sentence => `<p>${sentence.trim()}</p>`).join('');
+        isRecording = true;
+        finalTranscripts = []; // 이전 기록 초기화
+        sttLog.innerHTML = ''; // UI 초기화
+        sttPreview.textContent = '...';
+        sttStatus.textContent = '서버에 연결 중...';
+        micButton.style.backgroundColor = '#FF6B6B'; // 녹음 중 색상 변경
+
+        socket = new WebSocket(STT_URL);
+
+        socket.onopen = () => {
+            sttStatus.textContent = '연결 성공! 녹음 중...';
+            mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm;codecs=opus' });
+
+            mediaRecorder.ondataavailable = async (event) => {
+                if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
+                    const arrayBuffer = await event.data.arrayBuffer();
+                    socket.send(arrayBuffer);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({ type: 'stop' }));
+                }
+                // 서버가 연결을 닫도록 둡니다.
+            };
+            
+            mediaRecorder.start(250); // 250ms 간격으로 데이터 전송
+        };
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            switch (data.type) {
+                case 'transcript':
+                    if (data.final) {
+                        sttPreview.textContent = '...';
+                        const p = document.createElement('p');
+                        p.textContent = data.text;
+                        p.style.margin = '0 0 5px 0';
+                        sttLog.appendChild(p);
+                        finalTranscripts.push(data.text);
+                        checkSimilarity();
+                    } else {
+                        sttPreview.textContent = data.text;
+                    }
+                    break;
+                case 'error':
+                    sttStatus.textContent = `오류: ${data.message}`;
+                    console.error('STT 오류:', data.message);
+                    stopRecording();
+                    break;
+            }
+        };
+
+        socket.onerror = (error) => {
+            sttStatus.textContent = 'WebSocket 오류가 발생했습니다.';
+            console.error('WebSocket 오류:', error);
+            stopRecording();
+        };
+
+        socket.onclose = (event) => {
+            sttStatus.textContent = '연결이 종료되었습니다. 다시 시도하세요.';
+            console.log('WebSocket 닫힘:', event);
+            if (isRecording) {
+                stopRecording(); // 예기치 않게 닫혔을 경우 정리
+            }
+        };
+    }
+
+    // 4. 녹음 중지 처리
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+        }
+        // onstop 핸들러가 stop 메시지를 보낼 것입니다.
+        
+        isRecording = false;
+        sttStatus.textContent = '녹음이 중지되었습니다. 다시 시작하려면 버튼을 누르세요.';
+        micButton.style.backgroundColor = '#AEE5D8'; // 원래 색상으로 복원
+        mediaRecorder = null;
+        // 소켓은 서버에 의해 닫히거나 onclose 핸들러에서 정리됩니다.
+    }
+
+    // 5. 텍스트 유사도 검사 및 버튼 활성화
+    function checkSimilarity() {
+        const originalText = passageContent.innerText.trim();
+        const transcribedText = finalTranscripts.join(' ').trim();
+
+        if (originalText.length === 0 || transcribedText.length === 0) return;
+
+        const similarity = calculateSimilarity(originalText, transcribedText);
+        console.log(`유사도: ${similarity}%`);
+
+        if (similarity >= 60) {
+            doneButton.style.backgroundColor = '#FFD6E0'; // 활성화 색상
+            doneButton.style.cursor = 'pointer';
+            doneButton.style.pointerEvents = 'auto';
+            sttStatus.textContent = '유사도 60% 이상! 다음으로 진행할 수 있습니다.';
+        }
     }
 
     /**
-     * 3. 서버에 OCR을 요청하고 결과를 받아 화면에 표시하는 함수
-     * @param {string} id - 업로드된 파일의 ID
+     * Levenshtein 거리 계산을 통한 유사도 측정
+     * @param {string} str1
+     * @param {string} str2
+     * @returns {number} 유사도 (0-100)
      */
-    async function fetchOcrText(id) {
-        // 사용자에게 로딩 중임을 알립니다.
-        passageTitle.textContent = '텍스트 변환 중...';
-        passageContent.textContent = '지문을 불러오는 중입니다. 잠시만 기다려주세요...';
+    function calculateSimilarity(str1, str2) {
+        const distance = levenshteinDistance(str1, str2);
+        const maxLength = Math.max(str1.length, str2.length);
+        if (maxLength === 0) return 100;
+        const similarity = (1 - distance / maxLength) * 100;
+        return similarity;
+    }
 
+    function levenshteinDistance(a, b) {
+        const matrix = Array(b.length + 1).fill(null).map(() => Array(a.length + 1).fill(null));
+        for (let i = 0; i <= a.length; i += 1) { matrix[0][i] = i; }
+        for (let j = 0; j <= b.length; j += 1) { matrix[j][0] = j; }
+        for (let j = 1; j <= b.length; j += 1) {
+            for (let i = 1; i <= a.length; i += 1) {
+                const indicator = a[i - 1] === b[j - 1] ? 0 : 1;
+                matrix[j][i] = Math.min(
+                    matrix[j][i - 1] + 1,      // deletion
+                    matrix[j - 1][i] + 1,      // insertion
+                    matrix[j - 1][i - 1] + indicator, // substitution
+                );
+            }
+        }
+        return matrix[b.length][a.length];
+    }
+
+    // --- 기존 OCR 텍스트 로딩 함수 ---
+    async function fetchOcrText(id) {
+        passageTitle.textContent = '텍스트 변환 중...';
+        passageContent.textContent = '지문을 불러오는 중입니다...';
         try {
             const response = await fetch(`${BASE_URL}/api/ocr`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                // API 명세에 따라 'fileId' 키로 ID를 보냅니다.
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ fileId: id }),
             });
-
-            if (!response.ok) {
-                throw new Error(`서버 응답 오류: ${response.status}`);
-            }
-
+            if (!response.ok) throw new Error(`서버 응답 오류: ${response.status}`);
             const result = await response.json();
-
-            console.log('서버로부터 받은 OCR 응답:', result); // 서버 응답 전체를 로그에 출력
-
             if (result.ok) {
-                // 성공 시, 제목과 지문 내용을 업데이트합니다.
                 passageTitle.textContent = '오늘의 지문';
-                // API 응답의 'fullText' 필드를 화면에 맞게 포맷팅합니다.
                 passageContent.innerHTML = formatOcrText(result.fullText);
             } else {
-                // API가 ok: false를 반환한 경우
-                throw new Error(result.error || '알 수 없는 오류가 발생했습니다.');
+                throw new Error(result.error || '알 수 없는 오류');
             }
-
         } catch (error) {
-            // 네트워크 오류 또는 API 처리 중 발생한 오류를 화면에 표시합니다.
             passageTitle.textContent = '오류 발생';
             passageContent.textContent = `지문을 불러오는 데 실패했습니다: ${error.message}`;
             console.error('OCR Fetch Error:', error);
         }
+    }
+
+    function formatOcrText(text) {
+        const singleLineText = text.replace(/(\r\n|\n|\r)/gm, " ").trim();
+        const sentences = singleLineText.match(/[^.!?]+[.!?]+(\s+|$)/g);
+        if (!sentences) {
+            return `<p>${singleLineText}</p>`;
+        }
+        return sentences.map(sentence => `<p>${sentence.trim()}</p>`).join('');
     }
 });

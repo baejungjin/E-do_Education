@@ -3,51 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>파일 읽기</title>
+    <title>지문 읽기</title>
     <link rel="stylesheet" href="assets/read.css">
 </head>
 <body>
-    <a href="load.html" class="back-button">돌아가기</a>
-    
     <div class="instruction-container">
-        <p class="instruction-text">지문을 소리내어 읽어주세요</p>
-        <p class="sub-instruction-text">전체 지문을 보면서, 밑줄을 따라 또박또박 읽어봐요</p>
+        <h1 class="instruction-text">지문을 소리내어 읽어주세요</h1>
+        <p class="sub-instruction-text">차분하게, 한 걸음씩</p>
     </div>
 
     <div class="main-content-wrapper">
         <div class="passage-container">
             <div class="passage-header">
                 <h2 class="passage-title">오늘의 지문</h2>
-                <hr class="divider">
             </div>
+            <hr class="divider">
             <div class="passage-content">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh.</p>
-                <p>Cras ac felis adipiscing purus fermentum ornare. Mauris nonummy turpis eget felis. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus. Duis quis erat vitae risus posuere venenatis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In hac habitasse platea dictumst. In egestas, tortor eget pellentesque lacinia, sem libero volutpat magna, et bibendum ligula est vel enim. Maecenas lorem. Maecenas delor. Pellentesque sapien. Cras eleifend urna eu nulla. Ut porta diam scelerisque tortor. Praesent vitae eros. Fusce consectetuer neque eu nisl. Quisque quis justo. Sed vel lectus. Nulla in mi. Vivamus eget felis eget enim laoreet ultricies. Nullam dignissim, felis eu semper viverra, neque ligula maximus mi, vel commodo velit magna vel justo. Aliquam erat volutpat.</p>
-                <p>Integer rutrum, orci vestibulum ullamcorper ultricies, lacus quam ultricies odio, vitae placerat pede sem sit amet enim. Phasellus et lorem id felis nonummy placerat. Fusce iaculis, est quis lacinia pretium, pede metus molestie lacus, at gravida wisi ante at libero. Quisque ornare, wisi sed feugiat suscipit, nisl magna facilisis enim, id eleifend nunc wisi nec sapien. In quam. Etiam dolor quam, tincidunt a, ornare vel, cachorros vel, dolor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Ut bibendum, neque ut imperdiet laoreet, enim lacus tempus odio, eget convallis wisi enim eget quam. In menfis. Praesent turpis. Integer posuere, arcu nec faucibus fringilla, nunc est dignissim lacus, vitae semper nisl turpis vel sem. Nam lorem. In hac habitasse platea dictumst. Mauris rutrum, sem ac varius gravida, sapien dolor ullamcorper nulla, et commodo erat enim quis nulla. In sed massa. Duis imperdiet commodo dolor. Cras sodales, lorem ac bibendum iaculis, nisi eros sodales enim, vel porta lectus enim eget dolor. Duis nunc. Pellentesque sapien. Proin molestie, dolor quis egas-tas dapibus, leo quam aliquet diam, vel cursus nisi nisl sit amet tortor.</p>
+                <!-- OCR 텍스트가 여기에 삽입됩니다. -->
+                <p>텍스트 변환 중...</p>
             </div>
         </div>
+
         <div class="side-container">
             <div class="side-header">
-                <h2 class="side-title">소리 내어 읽어봐요</h2>
-                <p class="side-subtitle">마이크 버튼을 누르고 따라 읽으면 돼요</p>
+                <h2 class="side-title">따라읽기</h2>
+                <p class="side-subtitle">마이크를 누르고 녹음을 시작하세요</p>
             </div>
-            <div class="mic-button">
-                <svg width="80" height="120" viewBox="0 0 100 150">
-                    <rect x="20" y="10" width="60" height="90" rx="30" fill="none" stroke="#10B981" stroke-width="10"></rect>
-                    <line x1="50" y1="100" x2="50" y2="140" stroke="#10B981" stroke-width="10"></line>
-                    <line x1="25" y1="140" x2="75" y2="140" stroke="#10B981" stroke-width="10" stroke-linecap="round"></line>
+            <div id="mic-button" class="mic-button" style="cursor: pointer;">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="white"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2h2v2a5 5 0 0 0 10 0v-2h2z" fill="white"/>
                 </svg>
             </div>
-            <p class="mic-label">눌러서 녹음 시작</p>
-            <div class="volume-bar">
-                <div class="volume-fill"></div>
+            <div id="stt-status" class="feedback-text">마이크 권한을 요청하는 중...</div>
+            
+            <div id="stt-preview-container" style="margin-top: 20px; min-height: 50px; width: 100%; text-align: center;">
+                <p style="font-weight: bold;">인식 중인 텍스트:</p>
+                <p id="stt-preview" style="color: #888;">...</p>
             </div>
-            <p class="feedback-text">잘하고 있어요 계속 읽어볼까요?</p>
-            <a href="readwell.html" class="done-button">다 읽었어요</a>
+
+            <div id="stt-log-container" style="margin-top: 15px; text-align: left; width: 100%; height: 120px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px; background: #f9f9f9;">
+                <p style="font-weight: bold; margin-top: 0;">최종 인식 결과:</p>
+                <div id="stt-log"></div>
+            </div>
+
+            <a href="readwell.html" id="done-button" class="done-button" style="background-color: #E0E0E0; cursor: not-allowed; pointer-events: none; margin-top: 15px;">다 읽었어요</a>
         </div>
     </div>
 
-    <script src="assets/read.js" defer></script>
+    <a href="study.html" class="back-button">뒤로가기</a>
+
+    <script src="assets/read.js"></script>
 </body>
 </html>
-<!-- Gemini CLI -->
