@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const submitBtn = document.getElementById('submit-btn');
     const BASE_URL = 'https://e-do.onrender.com';
 
+    // 로딩 관련 요소
+    const loadingScreen = document.getElementById('loading-screen');
+    const wrapper = document.querySelector('.wrapper');
+
     let questions = [];
     let currentQuestionIndex = 0;
     let selectedButton = null;
@@ -12,12 +16,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function initialize() {
         const fileId = new URLSearchParams(window.location.search).get('fileId');
         if (!fileId) {
-            questionText.textContent = '오류: 파일 ID가 없습니다.';
+            loadingScreen.innerHTML = '오류: 파일 ID가 없습니다.';
             return;
         }
 
         try {
-            // Fetch both OCR and Quiz in parallel
+            // 병렬로 지문과 퀴즈 데이터 가져오기
             const [ocrResult, quizResult] = await Promise.all([
                 fetch(`${BASE_URL}/api/ocr`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fileId }) }).then(res => res.json()),
                 fetch(`${BASE_URL}/api/quiz`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fileId, level: '초급', style: '지문 이해' }) }).then(res => res.json())
@@ -28,10 +32,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (!quizResult.ok) throw new Error(quizResult.error || '퀴즈 생성 실패');
             questions = quizResult.questions || [];
+            
+            // 데이터 로딩 성공 시 화면 전환
+            loadingScreen.style.display = 'none';
+            wrapper.style.display = 'block';
+
             displayQuestion();
 
         } catch (error) {
-            questionText.textContent = `오류: ${error.message}`;
+            // 오류 발생 시 로딩 화면에 메시지 표시
+            loadingScreen.innerHTML = `오류가 발생했습니다: ${error.message}`;
         }
     }
 
