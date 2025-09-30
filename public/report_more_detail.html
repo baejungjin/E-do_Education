@@ -4,21 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>세부 리포트</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="src/css/report_more_detail.css">
 </head>
 <body>
-    <div class="container">
-        <header>
+    <a href="index.html" class="home-btn">🏠 홈으로</a>
+    <div class="wrapper">
+        <header class="header">
             <h1>세부 리포트</h1>
-            <a href="report.html" class="back-button">리포트로 돌아가기</a>
+            <p>지난 한 주간의 학습 성과를 자세히 확인해보세요.</p>
         </header>
 
-        <div class="box-container">
-            <div class="box"></div>
-            <div class="box"></div>
-        </div>
+        <!-- 1. 요약 카드 -->
+        <section class="summary-grid">
+            <div class="card summary-card"><h3>정답률</h3><p>90%</p></div>
+            <div class="card summary-card"><h3>평균 학습 시간</h3><p>15:30</p></div>
+            <div class="card summary-card"><h3>참여 횟수</h3><p>13회</p></div>
+        </section>
 
-        <div class="long-box"></div>
+        <!-- 2. 차트 -->
+        <section class="chart-grid">
+            <div class="card chart-card"><h2>정답률 추이</h2><canvas id="correct-rate-chart"></canvas></div>
+            <div class="card chart-card"><h2>학습 시간 추이</h2><canvas id="study-time-chart"></canvas></div>
+        </section>
+
+        <!-- 3. 세부 분석 -->
+        <section class="detail-grid">
+            <div class="card detail-card"><h2>문제별 정답률</h2><table><thead><tr><th>문제 유형</th><th>정답률</th></tr></thead><tbody><tr><td>어휘</td><td>95%</td></tr><tr><td>문법</td><td>85%</td></tr><tr><td>독해</td><td>90%</td></tr></tbody></table></div>
+            <div class="card detail-card"><h2>학습 태도/집중도</h2><p>대체로 높은 집중도를 보였으나, 특정 시간대(오후 2-3시)에 집중력이 다소 저하되는 경향이 있습니다.</p></div>
+            <div class="card detail-card"><h2>사용자 피드백 요약</h2><p>"지문이 재미있었어요.", "문제가 조금 더 다양했으면 좋겠어요." 등의 긍정적 피드백이 있었습니다.</p></div>
+        </section>
+
+        <!-- 4. AI 피드백 -->
+        <section class="card ai-feedback">
+            <h2>오늘의 AI 피드백 ✨</h2>
+            <p>지난 주 학습 데이터를 분석한 결과, 꾸준히 학습에 참여하며 정답률이 점진적으로 상승하고 있습니다. 특히 어려워했던 '장문 독해' 유형의 정답률이 크게 향상된 점이 인상적입니다. 다음 주에는 새로운 유형에 도전해보는 것을 추천합니다.</p>
+        </section>
     </div>
 </body>
 </html>

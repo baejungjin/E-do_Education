@@ -1,65 +1,81 @@
+/* 기본 설정 */
 body {
-    background-color: #F8F9FA; /* 쿨 화이트 */
-    font-family: sans-serif;
-    color: #333;
+    background-color: #F8F9FA;
+    font-family: 'Pretendard', sans-serif;
     margin: 0;
-    padding: 30px;
+    padding: 40px 20px;
 }
 
-.container {
+.wrapper {
     max-width: 1200px;
     margin: 0 auto;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    border-bottom: 2px solid #E0E0E0;
-    padding-bottom: 20px;
-}
-
-header h1 {
-    font-size: 32px;
-    margin: 0;
-}
-
-.back-button {
-    padding: 10px 20px;
-    background-color: #AEE5D8;
-    color: #333;
+/* 홈 버튼 */
+.home-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     text-decoration: none;
-    font-weight: bold;
-    border-radius: 10px;
+    font-weight: 700;
+    color: #333;
+    transition: all 0.3s ease;
+    z-index: 100;
 }
+.home-btn:hover { transform: translateY(-2px); background-color: #F1F3F5; }
 
-.box-container {
-    display: flex;
-    gap: 30px;
-    margin-top: 30px;
+/* 헤더 */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
 }
+.header h1 { font-size: 32px; font-weight: 700; margin: 0 0 10px 0; }
+.header p { font-size: 18px; color: #666; margin: 0; }
 
-.box {
+/* 공통 카드 스타일 */
+.card {
     background-color: #fff;
-    border: 1px solid #E0E0E0;
-    border-radius: 15px;
-    flex: 1; /* Each box takes up equal space */
-    height: 400px; /* A fixed height for the empty boxes */
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+    text-align: left;
 }
+.card h2 { font-size: 20px; font-weight: 700; margin: 0 0 20px 0; padding-bottom: 15px; border-bottom: 1px solid #F0F0F0; }
+.card p { margin: 0; line-height: 1.7; color: #555; }
 
-.long-box {
-    background-color: #fff;
-    border: 1px solid #E0E0E0;
-    border-radius: 15px;
-    height: 200px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    margin-top: 30px;
+/* 그리드 레이아웃 */
+.summary-grid, .chart-grid, .detail-grid {
+    display: grid;
+    gap: 25px;
+    margin-bottom: 25px;
 }
+.summary-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.chart-grid { grid-template-columns: 1fr 1fr; }
+.detail-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 
+/* 개별 카드 스타일 */
+.summary-card { text-align: center; }
+.summary-card h3 { font-size: 18px; margin: 0 0 10px 0; color: #555; }
+.summary-card p { font-size: 32px; font-weight: 700; color: #333; }
+
+.chart-card canvas { width: 100%; height: 250px; background-color: #F8F9FA; border-radius: 10px; }
+
+.detail-card table { width: 100%; border-collapse: collapse; }
+.detail-card th, .detail-card td { padding: 12px; text-align: left; border-bottom: 1px solid #F0F0F0; }
+.detail-card th { font-weight: 700; }
+
+.ai-feedback { text-align: center; }
+.ai-feedback p { font-size: 17px; }
+
+/* 반응형 */
+@media (max-width: 992px) {
+    .chart-grid { grid-template-columns: 1fr; }
+}
 @media (max-width: 768px) {
-    .box-container {
-        flex-direction: column;
-    }
+    body { padding-top: 80px; }
+    .detail-grid { grid-template-columns: 1fr; }
 }
