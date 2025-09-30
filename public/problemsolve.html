@@ -12,6 +12,7 @@
         <div class="spinner"></div>
         <p>문제를 불러오는 중입니다...</p>
     </div>
+
     <div class="wrapper" style="display: none;">
         <header class="header">
             <h1>문제를 풀어보세요</h1>
@@ -21,18 +22,23 @@
         <main class="content-container">
             <section class="passage-card">
                 <h2 class="card-label">오늘의 지문 📖</h2>
-                <div class="passage-content"></div>
+                <div class="passage-content">
+                    <!-- JS를 통해 지문이 동적으로 채워집니다. -->
+                </div>
             </section>
 
             <section class="problem-card">
-                <h2 class="question-text">Q1. 사자가 위험에 처했을 때 누가 도와주었나요?</h2>
+                <h2 class="question-text"><!-- JS를 통해 질문이 동적으로 채워집니다. --></h2>
                 <div class="options-container">
-                    <button class="option-btn" data-answer="wrong"><span class="check-icon">✔</span><span>호랑이</span></button>
-                    <button class="option-btn" data-answer="correct"><span class="check-icon">✔</span><span>생쥐</span></button>
-                    <button class="option-btn" data-answer="wrong"><span class="check-icon">✔</span><span>사냥꾼</span></button>
-                    <button class="option-btn" data-answer="wrong"><span class="check-icon">✔</span><span>코끼리</span></button>
-                    <button class="option-btn" data-answer="wrong"><span class="check-icon">✔</span><span>기린</span></button>
+                    <!-- JS를 통해 선택지가 동적으로 채워집니다. -->
                 </div>
+
+                <!-- 피드백 영역 (초기에는 숨김) -->
+                <div id="feedback-container" style="display: none;">
+                    <h3 id="feedback-title"></h3>
+                    <p id="feedback-explanation"></p>
+                </div>
+
                 <button id="submit-btn" class="submit-btn" disabled>제출하기</button>
             </section>
         </main>
