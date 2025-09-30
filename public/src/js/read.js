@@ -45,7 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${BASE_URL}/api/ocr`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fileId }) });
             const result = await response.json();
             if (!response.ok || !result.ok) throw new Error(result.error || '텍스트를 불러오지 못했습니다.');
-            setupSentences(result.fullText || "");
+            // 명세서에 따르면 fullText가 없을 수 있어 preview로 폴백
+            const text = result.fullText || result.preview || "";
+            setupSentences(text);
         } catch (error) {
             passageDisplay.innerHTML = `<p style="color: red;">오류: ${error.message}</p>`;
         }

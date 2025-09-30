@@ -26,7 +26,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             ]);
 
             if (!ocrResult.ok) throw new Error(ocrResult.error || '지문 로딩 실패');
-            passageContent.innerHTML = `<p>${(ocrResult.fullText || '').replace(/\n/g, '</p><p>')}</p>`;
+            // 명세서 대응: fullText가 없을 수 있으므로 preview로 폴백
+            const passage = (ocrResult.fullText || ocrResult.preview || '').replace(/\n/g, '</p><p>');
+            passageContent.innerHTML = passage ? `<p>${passage}</p>` : '';
 
             if (!quizResult.ok) throw new Error(quizResult.error || '퀴즈 생성 실패');
             questions = Array.isArray(quizResult.questions) ? quizResult.questions : [];
