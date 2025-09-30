@@ -140,19 +140,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 번호 배지 + 체크아이콘 + 보기 텍스트로 명확한 시각/클릭 영역 제공
             button.innerHTML = `<span class="check-icon">✔</span><span>${choice}</span>`;
             const correctIndex = Number(question.answerIndex);
+            button.dataset.index = String(index); // 선택한 번호를 저장
             button.dataset.correct = String(index === correctIndex);
-            button.addEventListener('click', () => handleOptionSelect(button));
+            button.addEventListener('click', () => handleOptionSelect(button, index));
             optionsContainer.appendChild(button);
         });
     }
 
-    function handleOptionSelect(button) {
+    function handleOptionSelect(button, selectedIndex) {
         if (selectedButton) {
             selectedButton.classList.remove('selected');
         }
         button.classList.add('selected');
         selectedButton = button;
         submitBtn.disabled = false;
+        
+        // 선택한 번호와 정답 비교
+        const question = questions[currentQuestionIndex];
+        const correctIndex = Number(question.answerIndex);
+        const selected = Number(selectedIndex);
+        
+        console.log("선택:", selected);
+        console.log("정답:", correctIndex);
+        
+        // 즉시 정답/오답 확인
+        if (selected === correctIndex) {
+            alert("정답");
+        } else {
+            alert("오답");
+        }
     }
 
     submitBtn.addEventListener('click', () => {
