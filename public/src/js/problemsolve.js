@@ -157,13 +157,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // 선택한 번호와 정답 비교
         const question = questions[currentQuestionIndex];
-        const correctIndex = Number(question.answerIndex);
-        const selected = Number(selectedIndex);
+        const correctIndex = Number(question.answerIndex); // 0부터 시작하는 인덱스
+        const selected = Number(selectedIndex); // 0부터 시작하는 인덱스
         
-        console.log("선택:", selected);
-        console.log("정답:", correctIndex);
+        console.log("선택:", selected + 1); // 사용자에게 보이는 번호 (1부터 시작)
+        console.log("정답:", correctIndex + 1); // 사용자에게 보이는 번호 (1부터 시작)
         
-        // 즉시 정답/오답 확인
+        // 즉시 정답/오답 확인 (둘 다 0부터 시작하는 인덱스로 비교)
         if (selected === correctIndex) {
             alert("정답");
         } else {
