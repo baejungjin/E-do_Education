@@ -76,7 +76,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     submitBtn.addEventListener('click', () => {
         if (!selectedButton) return;
         const isCorrect = selectedButton.dataset.correct === 'true';
-        window.location.href = isCorrect ? 'right.html' : 'wrong.html';
+
+        if (isCorrect) {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion();
+            } else {
+                window.location.href = 'solvecomplete.html';
+            }
+        } else {
+            window.location.href = 'wrong.html';
+        }
     });
 
     initialize();
