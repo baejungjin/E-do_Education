@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const button = document.createElement('button');
             button.className = 'option-btn';
             // 번호 배지 + 체크아이콘 + 보기 텍스트로 명확한 시각/클릭 영역 제공
-            button.innerHTML = `<span class="num">${index + 1}</span><span class="check-icon">✔</span><span>${choice}</span>`;
+            button.innerHTML = `<span class="check-icon">✔</span><span>${choice}</span>`;
             const correctIndex = Number(question.answerIndex);
             button.dataset.correct = String(index === correctIndex);
             button.addEventListener('click', () => handleOptionSelect(button));
