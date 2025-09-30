@@ -140,8 +140,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 번호 배지 + 체크아이콘 + 보기 텍스트로 명확한 시각/클릭 영역 제공
             button.innerHTML = `<span class="check-icon">✔</span><span>${choice}</span>`;
             const correctIndex = Number(question.answerIndex);
+            // answerIndex가 1부터 시작하는 경우를 고려하여 0부터 시작하는 인덱스로 변환
+            const normalizedCorrectIndex = correctIndex >= 1 ? correctIndex - 1 : correctIndex;
             button.dataset.index = String(index); // 선택한 번호를 저장
-            button.dataset.correct = String(index === correctIndex);
+            button.dataset.correct = String(index === normalizedCorrectIndex);
             button.addEventListener('click', () => handleOptionSelect(button, index));
             optionsContainer.appendChild(button);
         });
