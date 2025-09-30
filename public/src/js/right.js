@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const feedbackBox = document.querySelector('.box-message');
-    const nextButton = document.querySelector('.action-button');
+    const feedbackBox = document.querySelector('.ai-feedback p');
+    const nextButton = document.querySelector('.cta-button');
 
     // 1. Get data from sessionStorage
     const feedback = sessionStorage.getItem('quizFeedback');
     const nextQuestionIndex = sessionStorage.getItem('nextQuestionIndex');
     const fileId = sessionStorage.getItem('fileId');
 
-    // 2. Display feedback
+    // 2. Display feedback (if provided by quiz)
     if (feedbackBox && feedback) {
         feedbackBox.textContent = feedback;
     }

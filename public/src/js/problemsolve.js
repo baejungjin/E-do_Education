@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     let selectedButton = null;
 
     async function initialize() {
-        const fileId = new URLSearchParams(window.location.search).get('fileId');
+        const params = new URLSearchParams(window.location.search);
+        const fileId = params.get('fileId');
+        const initialIndexParam = params.get('question');
         if (!fileId) {
             questionText.textContent = '오류: 파일 ID가 없습니다.';
             return;
@@ -27,7 +29,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             passageContent.innerHTML = `<p>${(ocrResult.fullText || '').replace(/\n/g, '</p><p>')}</p>`;
 
             if (!quizResult.ok) throw new Error(quizResult.error || '퀴즈 생성 실패');
-            questions = quizResult.questions || [];
+            questions = Array.isArray(quizResult.questions) ? quizResult.questions : [];
+
+            if (questions.length === 0) {
+                questionText.textContent = '문제가 없습니다. 다시 시도해 주세요.';
+                submitBtn.disabled = true;
+                return;
+            }
+
+            // 쿼리의 question 인덱스가 있으면 해당 문항으로 이동
+            const parsedIndex = Number(initialIndexParam);
+            if (!Number.isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex < questions.length) {
+                currentQuestionIndex = parsedIndex;
+            } else {
+                currentQuestionIndex = 0;
+            }
+
             displayQuestion();
 
         } catch (error) {
@@ -66,6 +83,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     submitBtn.addEventListener('click', () => {
         if (!selectedButton) return;
         const isCorrect = selectedButton.dataset.correct === 'true';
+
+        // 현재 문제/피드백/다음 이동 정보를 저장
+        const fileId = new URLSearchParams(window.location.search).get('fileId');
+        const current = questions[currentQuestionIndex] || {};
+        const nextIndex = currentQuestionIndex + 1;
+
+        try {
+            sessionStorage.setItem('quizFeedback', current.explanation || '');
+            sessionStorage.setItem('fileId', fileId || '');
+            sessionStorage.setItem('nextQuestionIndex', String(nextIndex));
+        } catch (e) {
+            // 세션 저장 실패는 무시하고 진행
+        }
+
+        // 마지막 문제 처리: 정답이면 완료 페이지로 이동
+        const isLast = nextIndex >= questions.length;
+        if (isCorrect && isLast) {
+            window.location.href = 'solvecomplete.html';
+            return;
+        }
+
+        // 정답: 다음 문제 안내 페이지, 오답: 같은 문제로 재도전 페이지
         window.location.href = isCorrect ? 'right.html' : 'wrong.html';
     });
 

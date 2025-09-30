@@ -15,23 +15,21 @@
         </header>
 
         <main class="content-container">
+            <!-- 지문 카드 -->
             <section class="passage-card">
                 <h2 class="card-label">오늘의 지문 📖</h2>
-                <div class="passage-content">
-                    <p>사자는 생쥐가 고마워서 "고맙다, 이 은혜는 평생 잊지 않을게."라고 말했어요. 생쥐는 "천만에요." 하고 숲 속으로 사라졌어요. 며칠 뒤, 사자는 사냥꾼의 그물에 걸리고 말았어요. 사자가 아무리 울부짖어도 소용없었어요. 그때, 생쥐가 나타나 날카로운 이빨로 그물을 갉아 끊어주었어요. 덕분에 사자는 무사히 풀려날 수 있었답니다.</p>
-                    <p>"정말 고맙다, 작은 친구야. 네 덕분에 살았어." 사자는 진심으로 감사하며 말했어요. 생쥐는 "지난번에 저를 살려주셨잖아요. 이제 저희는 친구예요."라며 웃었어요. 그 후로 사자와 생쥐는 가장 친한 친구가 되어 숲 속에서 행복하게 지냈답니다.</p>
-                    <p>이 이야기는 우리에게 아무리 작은 존재라도 서로 도우며 살아야 한다는 교훈을 줍니다. 또한, 작은 친절이 나중에 큰 보답으로 돌아올 수 있다는 것을 보여줍니다. 우리는 모두 서로에게 소중한 친구가 될 수 있습니다.</p>
+                <div class="passage-content" id="passage-content">
+                    <!-- JS에서 지문 텍스트 삽입 -->
                 </div>
             </section>
 
+            <!-- 문제 카드 -->
             <section class="problem-card">
-                <h2 class="question-text">Q1. 사자가 위험에 처했을 때 누가 도와주었나요?</h2>
-                <div class="options-container">
-                    <button class="option-btn" data-answer="wrong"><span class="check-icon">✔</span><span>호랑이</span></button>
-                    <button class="option-btn" data-answer="correct"><span class="check-icon">✔</span><span>생쥐</span></button>
-                    <button class="option-btn" data-answer="wrong"><span class="check-icon">✔</span><span>사냥꾼</span></button>
-                    <button class="option-btn" data-answer="wrong"><span class="check-icon">✔</span><span>코끼리</span></button>
-                    <button class="option-btn" data-answer="wrong"><span class="check-icon">✔</span><span>기린</span></button>
+                <h2 class="question-text" id="question-text">
+                    <!-- JS에서 문제 텍스트 삽입 -->
+                </h2>
+                <div class="options-container" id="options-container">
+                    <!-- JS에서 보기 버튼 삽입 -->
                 </div>
                 <button id="submit-btn" class="submit-btn" disabled>제출하기</button>
             </section>
