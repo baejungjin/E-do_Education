@@ -49,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // 명세서에 따르면 fullText가 없을 수 있어 preview로 폴백
             const text = result.fullText || result.preview || "";
             setupSentences(text);
+
+            // 퀴즈를 미리 받아서 캐시(세션)해 UX 향상
+            prefetchQuiz(fileId).catch(() => {});
         } catch (error) {
             passageDisplay.innerHTML = `<p style="color: red;">오류: ${error.message}</p>`;
         }
@@ -64,7 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
             sentenceEl.textContent = sentenceText.trim();
             passageDisplay.appendChild(sentenceEl);
         });
-        showNextSentence();
+        // 시작 전 안내를 보여주고, 사용자가 시작을 누르면 첫 문장을 진행
+        showStartPrompt();
+        nextSentenceBtn.disabled = true;
         nextSentenceBtn.addEventListener('click', showNextSentence);
         micBtn.addEventListener('click', toggleRecording);
         retryBtn.addEventListener('click', () => startRecording());
@@ -86,11 +91,66 @@ document.addEventListener('DOMContentLoaded', () => {
         startRecording();
     }
 
+    // --- 퀴즈 프리페치 & 캐시 ---
+    async function prefetchQuiz(fileId) {
+        try {
+            const payload = { fileId, level: '초급', style: '지문 이해' };
+            const res = await fetch(`${BASE_URL}/api/quiz`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok || !data.ok || !Array.isArray(data.questions) || data.questions.length === 0) {
+                return;
+            }
+            const cache = { fileId, questions: data.questions, ts: Date.now() };
+            sessionStorage.setItem(`quizCache:${fileId}`, JSON.stringify(cache));
+        } catch (e) {
+            // 네트워크 실패는 무시 (문제 페이지에서 재시도)
+        }
+    }
+
     function updateSentenceStyles() {
         passageDisplay.querySelectorAll('.sentence').forEach((el, index) => {
             el.classList.remove('current', 'previous', 'visible');
             if (index < currentIndex) el.classList.add('previous', 'visible');
             else if (index === currentIndex) el.classList.add('current', 'visible');
+        });
+    }
+
+    // --- 시작 안내 오버레이 ---
+    function ensureStartStyles() {
+        if (document.getElementById('start-prompt-style')) return;
+        const style = document.createElement('style');
+        style.id = 'start-prompt-style';
+        style.textContent = `
+        .start-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);display:flex;justify-content:center;align-items:center;z-index:9998}
+        .start-card{background:#fff;border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,0.15);padding:28px 24px;width:min(520px,92%);text-align:center;font-family:Pretendard,system-ui,sans-serif}
+        .start-title{font-size:22px;font-weight:700;color:#333;margin:0 0 8px 0}
+        .start-sub{font-size:15px;color:#666;margin:0 0 18px 0}
+        .start-btn{display:inline-block;background:#42A5F5;color:#fff;border:none;border-radius:14px;padding:12px 20px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(66,165,245,0.3);}
+        .start-btn:hover{background:#1E88E5}
+        `;
+        document.head.appendChild(style);
+    }
+
+    function showStartPrompt() {
+        ensureStartStyles();
+        const overlay = document.createElement('div');
+        overlay.className = 'start-overlay';
+        overlay.innerHTML = `
+            <div class="start-card">
+                <h3 class="start-title">읽기를 시작해볼까요?</h3>
+                <p class="start-sub">버튼을 누르면 첫 문장이 표시되고 녹음이 시작돼요.</p>
+                <button class="start-btn">시작하기</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        const startBtn = overlay.querySelector('.start-btn');
+        startBtn.addEventListener('click', () => {
+            overlay.remove();
+            showNextSentence();
         });
     }
 
@@ -141,10 +201,57 @@ document.addEventListener('DOMContentLoaded', () => {
         feedbackMessage.textContent = "분석 중...";
     }
 
+    // --- 텍스트 유사도 유틸(완화 기준) ---
+    function normalizeText(text) {
+        return (text || '')
+            .toLowerCase()
+            .replace(/\s+/g, '')
+            .replace(/[.,!?"'`~:;\-()[\]{}…·]/g, '')
+            .replace(/\u200B/g, '');
+    }
+    function levenshtein(a, b) {
+        const m = a.length, n = b.length;
+        if (m === 0) return n; if (n === 0) return m;
+        const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+        for (let i = 0; i <= m; i++) dp[i][0] = i;
+        for (let j = 0; j <= n; j++) dp[0][j] = j;
+        for (let i = 1; i <= m; i++) {
+            for (let j = 1; j <= n; j++) {
+                const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                dp[i][j] = Math.min(
+                    dp[i - 1][j] + 1,
+                    dp[i][j - 1] + 1,
+                    dp[i - 1][j - 1] + cost
+                );
+            }
+        }
+        return dp[m][n];
+    }
+    function similarityRatio(a, b) {
+        const maxLen = Math.max(a.length, b.length) || 1;
+        const dist = levenshtein(a, b);
+        return 1 - dist / maxLen;
+    }
+
     function checkSimilarity(transcribedText) {
         const originalSentence = sentences[currentIndex].trim();
-        const similarity = (originalSentence.includes(transcribedText.slice(0, 5)));
-        if (similarity) {
+        const normOriginal = normalizeText(originalSentence);
+        const normSpoken = normalizeText(transcribedText);
+
+        // 너무 짧은 인식은 노이즈로 간주
+        if (normSpoken.length < 4) {
+            onRecordingFail("조금 더 길게 읽어주세요");
+            return;
+        }
+
+        const ratio = similarityRatio(normOriginal, normSpoken);
+        const containsPrefix = normOriginal.includes(normSpoken.slice(0, 5));
+
+        // 문장 길이에 따라 완화된 임계값 적용
+        const isShortSentence = normOriginal.length < 12;
+        const pass = ratio >= (isShortSentence ? 0.6 : 0.7) || containsPrefix;
+
+        if (pass) {
             feedbackMessage.textContent = "잘했어요! 👏";
             sentencePassed = true;
             // 현재 문장 성공 시 녹음 종료

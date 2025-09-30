@@ -9,6 +9,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentQuestionIndex = 0;
     let selectedButton = null;
 
+    // --- 로딩 오버레이 유틸 ---
+    function ensureLoadingStyles() {
+        if (document.getElementById('global-loading-style')) return;
+        const style = document.createElement('style');
+        style.id = 'global-loading-style';
+        style.textContent = `
+        .loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,0.85);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999}
+        .loading-spinner{width:64px;height:64px;border-radius:50%;border:6px solid #e9ecef;border-top-color:#42A5F5;animation:spin 1s linear infinite}
+        .loading-text{margin-top:14px;font-family:Pretendard,system-ui,sans-serif;font-weight:700;color:#555}
+        @keyframes spin{to{transform:rotate(360deg)}}`;
+        document.head.appendChild(style);
+    }
+    function showLoading(message) {
+        ensureLoadingStyles();
+        let overlay = document.querySelector('.loading-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'loading-overlay';
+            overlay.innerHTML = '<div class="loading-spinner"></div><div class="loading-text"></div>';
+            document.body.appendChild(overlay);
+        }
+        const textEl = overlay.querySelector('.loading-text');
+        textEl.textContent = message || '문제를 불러오는 중...';
+        overlay.style.display = 'flex';
+    }
+    function hideLoading() {
+        const overlay = document.querySelector('.loading-overlay');
+        if (overlay) overlay.style.display = 'none';
+    }
+
     async function initialize() {
         const params = new URLSearchParams(window.location.search);
         const fileId = params.get('fileId');
@@ -19,11 +49,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            // Fetch both OCR and Quiz in parallel
-            const [ocrResult, quizResult] = await Promise.all([
-                fetch(`${BASE_URL}/api/ocr`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fileId }) }).then(res => res.json()),
-                fetch(`${BASE_URL}/api/quiz`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fileId, level: '초급', style: '지문 이해' }) }).then(res => res.json())
-            ]);
+            showLoading('문제를 불러오는 중...');
+            // 1) OCR는 항상 네트워크로 불러옴
+            const ocrPromise = fetch(`${BASE_URL}/api/ocr`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fileId }) }).then(res => res.json());
+
+            // 2) 퀴즈는 캐시 우선, 없으면 네트워크
+            let cached = null;
+            try {
+                const raw = sessionStorage.getItem(`quizCache:${fileId}`);
+                if (raw) cached = JSON.parse(raw);
+            } catch {}
+
+            let quizResult;
+            if (cached && Array.isArray(cached.questions) && cached.questions.length > 0) {
+                quizResult = { ok: true, questions: cached.questions };
+            } else {
+                quizResult = await fetch(`${BASE_URL}/api/quiz`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fileId, level: '초급', style: '지문 이해' }) }).then(res => res.json());
+                if (quizResult.ok && Array.isArray(quizResult.questions) && quizResult.questions.length > 0) {
+                    try { sessionStorage.setItem(`quizCache:${fileId}`, JSON.stringify({ fileId, questions: quizResult.questions, ts: Date.now() })); } catch {}
+                }
+            }
+
+            const ocrResult = await ocrPromise;
 
             if (!ocrResult.ok) throw new Error(ocrResult.error || '지문 로딩 실패');
             // 명세서 대응: fullText가 없을 수 있으므로 preview로 폴백
@@ -48,8 +95,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             displayQuestion();
+            hideLoading();
 
         } catch (error) {
+            hideLoading();
             questionText.textContent = `오류: ${error.message}`;
         }
     }
