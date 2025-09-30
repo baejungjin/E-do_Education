@@ -134,16 +134,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectedButton = null;
         submitBtn.disabled = true;
 
+        // 정답 인덱스 정규화 (0부터 시작하도록)
+        let correctIndex = Number(question.answerIndex);
+        if (correctIndex >= 1) {
+            correctIndex = correctIndex - 1; // 1부터 시작하는 경우 0부터 시작하도록 변환
+        }
+
         question.choices.forEach((choice, index) => {
             const button = document.createElement('button');
             button.className = 'option-btn';
-            // 번호 배지 + 체크아이콘 + 보기 텍스트로 명확한 시각/클릭 영역 제공
             button.innerHTML = `<span class="check-icon">✔</span><span>${choice}</span>`;
-            const correctIndex = Number(question.answerIndex);
-            // answerIndex가 1부터 시작하는 경우를 고려하여 0부터 시작하는 인덱스로 변환
-            const normalizedCorrectIndex = correctIndex >= 1 ? correctIndex - 1 : correctIndex;
-            button.dataset.index = String(index); // 선택한 번호를 저장
-            button.dataset.correct = String(index === normalizedCorrectIndex);
+            
+            // 정규화된 인덱스로 정답 여부 설정
+            button.dataset.correct = String(index === correctIndex);
+            button.dataset.index = String(index);
+            
             button.addEventListener('click', () => handleOptionSelect(button, index));
             optionsContainer.appendChild(button);
         });
@@ -159,19 +164,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // 선택한 번호와 정답 비교
         const question = questions[currentQuestionIndex];
-        const correctIndex = Number(question.answerIndex);
+        let correctIndex = Number(question.answerIndex);
+        
+        // 정답 인덱스 정규화 (0부터 시작하도록)
+        if (correctIndex >= 1) {
+            correctIndex = correctIndex - 1;
+        }
+        
         const selected = Number(selectedIndex);
         
-        console.log("선택:", selected + 1); // 사용자에게 보이는 번호 (1부터 시작)
-        console.log("정답:", correctIndex + 1); // 사용자에게 보이는 번호 (1부터 시작)
+        console.log("선택:", selected + 1);
+        console.log("정답:", correctIndex + 1);
         console.log("원본 answerIndex:", question.answerIndex);
-        console.log("현재 문제 인덱스:", currentQuestionIndex);
         
-        // answerIndex가 1부터 시작하는 경우를 고려하여 0부터 시작하는 인덱스로 변환
-        const normalizedCorrectIndex = correctIndex >= 1 ? correctIndex - 1 : correctIndex;
-        
-        // 즉시 정답/오답 확인
-        if (selected === normalizedCorrectIndex) {
+        // 정답/오답 확인
+        if (selected === correctIndex) {
             alert("정답");
         } else {
             alert("오답");
