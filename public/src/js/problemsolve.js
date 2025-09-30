@@ -164,9 +164,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const correctIndex = Number(question.answerIndex);
         const selected = Number(selectedIndex);
         
-        console.log("선택:", selected + 1);
-        console.log("정답:", correctIndex + 1);
+        console.log("=== 디버깅 정보 ===");
+        console.log("선택한 인덱스 (0부터):", selected);
+        console.log("선택한 번호 (1부터):", selected + 1);
         console.log("원본 answerIndex:", question.answerIndex);
+        console.log("정답 인덱스 (0부터):", correctIndex);
+        console.log("정답 번호 (1부터):", correctIndex + 1);
+        console.log("선택지들:", question.choices);
+        console.log("정답 선택지:", question.choices[correctIndex]);
+        console.log("==================");
         
         // 정답/오답 확인 (둘 다 0부터 시작하는 인덱스)
         if (selected === correctIndex) {
