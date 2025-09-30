@@ -172,3 +172,15 @@ body {
 }
 .retry-btn.active { display: block; }
 .retry-btn:hover { background-color: #BDBDBD; }
+
+.skip-btn {
+    background-color: #90CAF9; /* 파스텔 블루 */
+    color: #fff;
+}
+.skip-btn:hover { background-color: #64B5F6; }
+
+.btn:disabled {
+    background-color: #E0E0E0;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
