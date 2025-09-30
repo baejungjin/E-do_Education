@@ -84,22 +84,36 @@ body {
     margin: 0;
 }
 
-.file-item .arrow {
-    font-size: 24px;
-    font-weight: bold;
-    color: #ccc;
+.delete-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    font-weight: 300;
+    color: #aaa;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: color 0.2s ease;
+}
+
+.delete-btn:hover {
+    color: #333;
 }
 
 /* 업로드 버튼 */
-.upload-btn {
+.upload-btn-wrapper {
     position: fixed;
     bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
-    width: 80%; /* 너비 수정 */
-    max-width: 1000px; /* max-width 수정 */
-    min-height: 60px; /* 높이 범위 설정 */
-    display: flex; /* 중앙 정렬을 위해 flex 사용 */
+    width: 80%;
+    max-width: 1000px;
+    z-index: 10;
+}
+
+.upload-btn {
+    width: 100%;
+    min-height: 60px;
+    display: flex;
     justify-content: center;
     align-items: center;
     background-color: #42A5F5;

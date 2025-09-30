@@ -16,14 +16,13 @@
         </header>
 
         <main class="file-list">
-            <!-- 아래는 예시 아이템입니다. 실제로는 JS로 렌더링될 수 있습니다. -->
             <a href="#" class="file-item anim-on-load">
                 <span class="icon">📖</span>
                 <div class="file-info">
                     <p class="file-name">사자와 생쥐</p>
                     <p class="file-date">2025-09-15</p>
                 </div>
-                <span class="arrow">→</span>
+                <button class="delete-btn">&times;</button>
             </a>
             <a href="#" class="file-item anim-on-load">
                 <span class="icon">📖</span>
@@ -31,7 +30,7 @@
                     <p class="file-name">흥부와 놀부</p>
                     <p class="file-date">2025-09-12</p>
                 </div>
-                <span class="arrow">→</span>
+                <button class="delete-btn">&times;</button>
             </a>
             <a href="#" class="file-item anim-on-load">
                 <span class="icon">📖</span>
@@ -39,10 +38,12 @@
                     <p class="file-name">해와 달이 된 오누이</p>
                     <p class="file-date">2025-09-10</p>
                 </div>
-                <span class="arrow">→</span>
+                <button class="delete-btn">&times;</button>
             </a>
         </main>
+    </div>
 
+    <div class="upload-btn-wrapper">
         <label for="new-file-upload" class="upload-btn anim-on-load">+ 새 파일 업로드</label>
         <input type="file" id="new-file-upload" hidden>
     </div>

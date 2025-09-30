@@ -1,16 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // 기존 파일 목록 로드 로직이 있다면 여기에 유지합니다.
-    // 예: loadFiles();
+  // 애니메이션 효과 적용할 요소 선택
+  const animatedItems = document.querySelectorAll(".anim-on-load");
 
-    // 애니메이션 로직 추가
-    const animatedElements = document.querySelectorAll(".anim-on-load");
+  // 페이지 로드 시 각 요소에 순차적으로 visible 클래스 추가
+  animatedItems.forEach((item, index) => {
+    setTimeout(() => {
+      item.classList.add("visible");
+    }, index * 200); // 0.2초 간격으로 순차 등장
+  });
 
-    animatedElements.forEach((el, index) => {
-        setTimeout(() => {
-            el.classList.add("visible");
-        }, 100 + index * 100); // 0.1초 간격으로 순차적 표시
+  // 파일 업로드 input 핸들링 (옵션)
+  const fileInput = document.getElementById("new-file-upload");
+  const uploadBtn = document.querySelector(".upload-btn");
+
+  if (fileInput && uploadBtn) {
+    uploadBtn.addEventListener("click", () => {
+      fileInput.click();
     });
-});
 
-// 예시: 기존 파일 로드 함수
-// function loadFiles() { ... }
+    fileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        alert(`"${file.name}" 파일이 업로드 되었습니다.`);
+        // TODO: 여기서 서버 업로드 로직 추가 가능
+      }
+    });
+  }
+});

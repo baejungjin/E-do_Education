@@ -1,195 +1,169 @@
+/* 기본 & 폰트 설정 */
+body {
+    background-color: #F8F9FA;
+    font-family: 'Pretendard', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
 
-        body {
-            background-color: #F8F9FA; /* 쿨 화이트 */
-            font-family: sans-serif;
-            text-align: center;
-            margin: 0;
-        }
-        .instruction-container {
-            padding-top: 40px;
-            padding-bottom: 20px;
-        }
-        .instruction-text {
-            font-size: 40px;
-            font-weight: bold;
-            color: #333;
-            margin-top: 0;
-            margin-bottom: 5px;
-        }
-        .sub-instruction-text {
-            font-size: 18px;
-            color: #555;
-        }
-        .main-content-wrapper {
-            display: flex;
-            padding: 0 60px 60px 40px;
-            gap: 40px;
-            align-items: stretch;
-        }
-        .passage-container {
-            flex-basis: 850px;
-            flex-grow: 1;
-            flex-shrink: 1;
-            height: 500px;
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            padding: 30px 40px;
-            box-sizing: border-box;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-        }
-        .passage-header {
-            flex-shrink: 0;
-        }
-        .passage-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin: 0;
-        }
-        .divider {
-            border: none;
-            height: 1px;
-            background-color: #E0E0E0;
-            margin: 20px 0;
-        }
-        .passage-content {
-            flex-grow: 1;
-            overflow-y: auto;
-            font-size: 24px;
-            line-height: 1.7;
-            color: #444;
-        }
-        .side-container {
-            flex-basis: 376px;
-            flex-grow: 1;
-            flex-shrink: 1;
-            height: 500px;
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            padding: 30px 40px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .side-header {
-            width: 100%;
-            text-align: left;
-        }
-        .side-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin: 0;
-        }
-        .side-subtitle {
-            font-size: 16px;
-            color: #555;
-            margin: 10px 0 0 0;
-        }
-        .mic-button {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background-color: #AEE5D8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-            flex-shrink: 0;
-            flex-grow: 0;
-        }
-        .mic-button:hover {
-            transform: scale(1.05);
-        }
-        .mic-label {
-            font-size: 16px;
-            font-weight: bold;
-            color: #555;
-            margin-top: 3px;
-        }
-        .volume-bar {
-            width: 120px;
-            height: 20px;
-            background-color: #E0E0E0;
-            border-radius: 10px;
-            margin-top: 3px;
-            overflow: hidden;
-        }
-        .volume-fill {
-            width: 30%; /* Initial fill for demonstration */
-            height: 100%;
-            background-color: #AEE5D8;
-            border-radius: 10px;
-            transition: width 0.1s linear;
-        }
-        .feedback-text {
-            font-size: 14px;
-            font-weight: bold;
-            color: #333;
-            margin-top: 10px; /* Adjusted margin */
-        }
-        #stt-preview-container {
-            margin-top: 15px;
-            min-height: 50px;
-            width: 100%;
-            text-align: center;
-        }
-        #stt-preview {
-            color: #888;
-            font-size: 16px;
-            min-height: 20px;
-        }
-        #stt-log-container {
-            margin-top: 15px;
-            text-align: left;
-            width: 100%;
-            height: 120px;
-            overflow-y: auto;
-            border: 1px solid #eee;
-            padding: 10px;
-            border-radius: 8px;
-            background: #f9f9f9;
-            font-size: 15px;
-            line-height: 1.4;
-        }
-        #stt-log p {
-            margin: 0 0 5px 0;
-        }
-        .done-button {
-            margin-top: 15px; /* Adjusted margin */
-        }
-        .done-button {
-            display: inline-block;
-            width: 160px;
-            padding: 15px 0;
-            background-color: #FFD6E0;
-            border-radius: 10px;
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-            font-size: 16px;
-            margin-top: 20px;
-            transition: transform 0.2s ease;
-        }
-        .done-button:hover {
-            transform: scale(1.02);
-        }
-        .back-button {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            padding: 10px 20px;
-            background-color: #AEE5D8;
-            color: #333;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 10px;
-            font-size: clamp(14px, 1.2vw, 16px);
-        }
+.container {
+    display: flex;
+    gap: 40px;
+    width: 90%;
+    max-width: 1200px;
+    padding: 40px;
+}
+
+/* 지문 영역 */
+.passage-container {
+    flex: 3;
+    background: #fff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+}
+
+.passage-display {
+    min-height: 300px;
+    font-family: 'Noto Serif KR', serif; /* 피치마켓체 대용 */
+    font-size: 22px;
+    line-height: 1.8;
+    color: #333;
+}
+
+.passage-display .sentence {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    display: block; /* 문장마다 줄바꿈 */
+    margin-bottom: 10px;
+}
+
+.passage-display .sentence.visible {
+    opacity: 1;
+}
+
+.passage-display .sentence.previous {
+    opacity: 0.3;
+}
+
+.passage-display .sentence.current {
+    font-weight: 700;
+    color: #000;
+}
+
+.next-sentence-btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 12px;
+    background: #E9ECEF;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.next-sentence-btn:hover { background: #DEE2E6; }
+
+/* 녹음기 영역 */
+.recorder-container { flex: 2; }
+
+.recorder-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.mic-btn {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #AEE5D8; /* 민트 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+.mic-btn.recording { transform: scale(1.1); }
+.mic-btn .icon { font-size: 40px; }
+
+.recording-animation {
+    display: none; /* 평소엔 숨김 */
+    height: 40px;
+    margin: 20px 0;
+}
+.recording-animation.active {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+}
+.recording-animation .bar {
+    width: 8px;
+    background-color: #AEE5D8;
+    border-radius: 4px;
+    animation: wave 1.2s infinite ease-in-out;
+}
+.recording-animation .bar:nth-child(2) { animation-delay: -1.0s; }
+.recording-animation .bar:nth-child(3) { animation-delay: -0.8s; }
+.recording-animation .bar:nth-child(4) { animation-delay: -0.6s; }
+.recording-animation .bar:nth-child(5) { animation-delay: -0.4s; }
+
+@keyframes wave {
+    0%, 100% { height: 10px; }
+    50% { height: 40px; }
+}
+
+.feedback-message {
+    min-height: 40px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #555;
+    margin-top: 20px;
+}
+
+/* 하단 버튼 */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn {
+    flex: 1;
+    padding: 18px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.done-btn { background-color: #FFD6E0; }
+.done-btn:hover { background-color: #FAC2D1; }
+
+.retry-btn {
+    background-color: #E0E0E0;
+    display: none; /* 평소엔 숨김 */
+}
+.retry-btn.active { display: block; }
+.retry-btn:hover { background-color: #BDBDBD; }
