@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const STT_URL = 'wss://e-do.onrender.com/stt';
     let sentences = [];
     let currentIndex = -1;
+    let sentencePassed = false;
     let isRecording = false;
     let socket;
     let mediaRecorder;
@@ -71,13 +72,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 문장 표시 로직 ---
     function showNextSentence() {
+        // 다음 문장으로 이동 (처음 호출 포함)
         if (currentIndex >= sentences.length - 1) {
             nextSentenceBtn.textContent = "모든 문장을 다 읽었어요!";
             nextSentenceBtn.disabled = true;
             return;
         }
         currentIndex++;
+        sentencePassed = false;
         updateSentenceStyles();
+        // 새 문장 시작 시 다음 버튼은 비활성화하고 자동 녹음 시작
+        nextSentenceBtn.disabled = true;
+        startRecording();
     }
 
     function updateSentenceStyles() {
@@ -140,9 +146,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const similarity = (originalSentence.includes(transcribedText.slice(0, 5)));
         if (similarity) {
             feedbackMessage.textContent = "잘했어요! 👏";
+            sentencePassed = true;
+            // 현재 문장 성공 시 녹음 종료
+            stopRecording();
             // 마지막 문장까지 성공하면 '다 읽었어요' 버튼 활성화
             if (currentIndex === sentences.length - 1) {
                 doneBtn.disabled = false;
+                nextSentenceBtn.disabled = true;
+            } else {
+                // 다음 문장으로 넘어갈 수 있도록 버튼 활성화
+                nextSentenceBtn.disabled = false;
+                // 선택: 자동으로 다음 문장으로 넘어가기 (원하면 지연 조정/제거)
+                setTimeout(() => {
+                    if (sentencePassed) showNextSentence();
+                }, 700);
             }
         } else {
             onRecordingFail("조금 다른 것 같아요. 다시 시도해볼까요?");
