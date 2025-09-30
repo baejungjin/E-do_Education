@@ -18,17 +18,17 @@
         <section class="summary-grid">
             <div class="summary-card">
                 <span class="card-icon">✅</span>
-                <div class="card-value">8</div>
+                <div class="card-value" id="sc-correct">--</div>
                 <div class="card-label">맞힌 문제</div>
             </div>
             <div class="summary-card">
                 <span class="card-icon">❌</span>
-                <div class="card-value">2</div>
+                <div class="card-value" id="sc-wrong">--</div>
                 <div class="card-label">틀린 문제</div>
             </div>
             <div class="summary-card">
                 <span class="card-icon">⏱️</span>
-                <div class="card-value">25분</div>
+                <div class="card-value" id="sc-time">--분</div>
                 <div class="card-label">총 학습 시간</div>
             </div>
         </section>
@@ -43,5 +43,6 @@
             <a href="#" class="cta-button primary">새 지문으로 학습</a>
         </footer>
     </div>
+    <script src="src/js/solvecomplete.js"></script>
 </body>
 </html>

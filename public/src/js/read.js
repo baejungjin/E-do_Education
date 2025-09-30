@@ -63,9 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
         currentIndex = -1;
         passageDisplay.innerHTML = '';
         sentences.forEach(sentenceText => {
+            // 의미 없는 띄어쓰기 제거(여러 공백, 문장부호 앞 공백, 한글/영문 사이 과도 공백)
+            const cleaned = sentenceText
+                .replace(/\s{2,}/g, ' ')
+                .replace(/\s+([.,!?;:])/g, '$1')
+                .replace(/([가-힣A-Za-z])\s+([가-힣A-Za-z])/g, '$1 $2')
+                .trim();
             const sentenceEl = document.createElement('span');
             sentenceEl.className = 'sentence';
-            sentenceEl.textContent = sentenceText.trim();
+            sentenceEl.textContent = cleaned;
             passageDisplay.appendChild(sentenceEl);
         });
         // 시작 전 안내를 보여주고, 사용자가 시작을 누르면 첫 문장을 진행

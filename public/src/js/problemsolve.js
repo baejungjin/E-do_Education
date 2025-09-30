@@ -109,6 +109,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 currentQuestionIndex = 0;
             }
 
+            // 퀴즈 세션 통계 초기화(첫 문제 진입 시)
+            if (currentQuestionIndex === 0) {
+                try {
+                    const stats = { fileId, total: questions.length, correct: 0, wrong: 0, startTs: Date.now() };
+                    sessionStorage.setItem(`quizStats:${fileId}`, JSON.stringify(stats));
+                } catch {}
+            }
+
             displayQuestion();
             hideLoading();
 
@@ -161,6 +169,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             sessionStorage.setItem('quizFeedback', current.explanation || '');
             sessionStorage.setItem('fileId', fileId || '');
             sessionStorage.setItem('nextQuestionIndex', String(nextIndex));
+            // 통계 업데이트
+            const key = `quizStats:${fileId}`;
+            const raw = sessionStorage.getItem(key);
+            if (raw) {
+                const stats = JSON.parse(raw);
+                if (isCorrect) stats.correct = (stats.correct || 0) + 1;
+                else stats.wrong = (stats.wrong || 0) + 1;
+                sessionStorage.setItem(key, JSON.stringify(stats));
+            }
         } catch (e) {
             // 세션 저장 실패는 무시하고 진행
         }

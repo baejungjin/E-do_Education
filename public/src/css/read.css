@@ -47,13 +47,15 @@ body {
 
 .passage-display .sentence {
     opacity: 0;
-    transition: opacity 0.5s ease;
+    transform: translateY(8px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
     display: block; /* 문장마다 줄바꿈 */
     margin-bottom: 10px;
 }
 
 .passage-display .sentence.visible {
     opacity: 1;
+    transform: translateY(0);
 }
 
 .passage-display .sentence.previous {
