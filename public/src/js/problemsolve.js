@@ -134,18 +134,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectedButton = null;
         submitBtn.disabled = true;
 
-        // 정답 인덱스 정규화 (0부터 시작하도록)
-        let correctIndex = Number(question.answerIndex);
-        if (correctIndex >= 1) {
-            correctIndex = correctIndex - 1; // 1부터 시작하는 경우 0부터 시작하도록 변환
-        }
+        // answerIndex는 이미 0부터 시작하는 인덱스
+        const correctIndex = Number(question.answerIndex);
 
         question.choices.forEach((choice, index) => {
             const button = document.createElement('button');
             button.className = 'option-btn';
             button.innerHTML = `<span class="check-icon">✔</span><span>${choice}</span>`;
             
-            // 정규화된 인덱스로 정답 여부 설정
+            // 정답 여부 설정 (index와 correctIndex 모두 0부터 시작)
             button.dataset.correct = String(index === correctIndex);
             button.dataset.index = String(index);
             
@@ -164,20 +161,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // 선택한 번호와 정답 비교
         const question = questions[currentQuestionIndex];
-        let correctIndex = Number(question.answerIndex);
-        
-        // 정답 인덱스 정규화 (0부터 시작하도록)
-        if (correctIndex >= 1) {
-            correctIndex = correctIndex - 1;
-        }
-        
+        const correctIndex = Number(question.answerIndex);
         const selected = Number(selectedIndex);
         
         console.log("선택:", selected + 1);
         console.log("정답:", correctIndex + 1);
         console.log("원본 answerIndex:", question.answerIndex);
         
-        // 정답/오답 확인
+        // 정답/오답 확인 (둘 다 0부터 시작하는 인덱스)
         if (selected === correctIndex) {
             alert("정답");
         } else {
