@@ -24,6 +24,9 @@ body {
     padding: 40px;
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    display: flex; /* 추가 */
+    flex-direction: column; /* 추가 */
+    height: 70vh; /* 높이 고정 */
 }
 
 .title {
@@ -33,9 +36,11 @@ body {
 }
 
 .passage-display {
-    min-height: 300px;
+    flex-grow: 1; /* 추가 */
+    overflow-y: auto; /* 추가 */
+    min-height: 0; /* flex-grow와 overflow를 함께 사용할 때 필요 */
     font-family: 'Noto Serif KR', serif; /* 피치마켓체 대용 */
-    font-size: 18px;
+    font-size: 22px;
     line-height: 1.8;
     color: #333;
 }
