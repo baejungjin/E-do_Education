@@ -3,21 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>퀴즈 풀기</title>
+    <title>지문 준비</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="src/css/study.css">
 </head>
 <body>
-    <div class="quiz-wrapper">
-        <header class="quiz-header">
-            <h1>퀴즈</h1>
-            <p>지문을 바탕으로 생성된 퀴즈를 풀어보세요.</p>
-        </header>
-        <div id="quiz-container" class="quiz-container">
-            <!-- 퀴즈가 여기에 동적으로 표시됩니다. -->
+    <div class="main-container">
+        <div class="content-wrapper">
+            <h1 class="title">학습할 지문을 준비해요</h1>
+            <p class="subtitle">파일이 있으면 불러오고, 없다면 새로 추가해요</p>
+            
+            <div class="action-buttons">
+                <a href="load.html" class="action-btn anim-on-load">
+                    <h3>파일 불러오기</h3>
+                    <p>전에 학습했던 파일을 다시 학습해요</p>
+                </a>
+                <a href="#" class="action-btn anim-on-load">
+                    <h3>새 지문 추가하기</h3>
+                    <p>새로운 PDF 파일을 업로드해서 학습해요</p>
+                </a>
+            </div>
         </div>
-        <button id="next-btn" class="next-btn" style="display: none;">다음 문제</button>
+        <a href="main.html" class="back-button anim-on-load">돌아가기</a>
     </div>
+
     <script src="src/js/study.js"></script>
 </body>
 </html>

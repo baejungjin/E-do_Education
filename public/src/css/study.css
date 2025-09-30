@@ -1,85 +1,145 @@
+/* 기본 설정 */
 body {
-    background-color: #F8F9FA;
+    background-color: #F8F9FA; /* 쿨 화이트 */
     font-family: 'Pretendard', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 20px;
+    margin: 0;
+}
+
+.main-container {
+    position: relative; /* 추가 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    padding: 40px 20px;
     box-sizing: border-box;
+    min-height: 100vh;
 }
 
-.quiz-wrapper {
-    width: 100%;
-    max-width: 700px;
-    background-color: #fff;
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+.content-wrapper {
     text-align: center;
-}
-
-.quiz-header {
-    margin-bottom: 30px;
-}
-
-.quiz-header h1 { font-size: 28px; margin: 0 0 10px 0; }
-.quiz-header p { font-size: 16px; color: #666; margin: 0; }
-
-.question {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 30px;
-}
-
-.options {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-}
-
-.option-btn {
     width: 100%;
-    padding: 18px;
-    border: 1px solid #E0E0E0;
-    border-radius: 16px;
-    background-color: #fff;
+}
+
+/* 타이틀 */
+.title {
+    font-size: 30px;
+    font-weight: 700; /* Bold */
+    margin-bottom: 12px;
+}
+
+.subtitle {
     font-size: 17px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    color: #777;
+    margin-top: 0;
+    margin-bottom: 50px;
 }
 
-.option-btn:hover:not(:disabled) {
-    background-color: #F1F3F5;
-    transform: translateY(-2px);
+/* 액션 버튼 */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px; /* 버튼 간격 */
+    width: 100%;
 }
 
-.option-btn.correct {
-    background-color: #E8F5E9; /* 정답 */
-    border-color: #4CAF50;
-    color: #1B5E20;
+.action-btn {
+    width: 100%;
+    max-width: 600px;
+    padding: 30px;
+    border-radius: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+    text-decoration: none;
+    color: #333;
+    text-align: left;
+    transition: all 0.3s ease;
 }
 
-.option-btn.incorrect {
-    background-color: #FFEBEE; /* 오답 */
-    border-color: #F44336;
-    color: #C62828;
+.action-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
 }
 
-.option-btn:disabled { cursor: not-allowed; opacity: 0.8; }
+.action-btn h3 {
+    font-size: 22px;
+    font-weight: 700; /* Bold */
+    margin: 0 0 8px 0;
+}
 
-.next-btn {
-    margin-top: 30px;
-    padding: 16px 30px;
-    border: none;
+.action-btn p {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+.action-buttons a:nth-child(1):hover {
+    background-color: #E3F4F0; /* 파스텔 민트 계열 */
+}
+
+.action-buttons a:nth-child(2):hover {
+    background-color: #FFF0E5; /* 코랄 핑크 계열 */
+}
+
+/* 돌아가기 버튼 */
+.back-button {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    padding: 10px 20px;
+    background-color: #AEE5D8;
+    color: #333;
+    text-decoration: none;
+    font-weight: 700; /* Bold */
     border-radius: 12px;
-    background-color: #42A5F5;
-    color: #fff;
-    font-size: 17px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    font-size: 15px;
+    transition: all 0.3s ease;
 }
 
-.next-btn:hover { background-color: #1E88E5; }
+.back-button:hover {
+    transform: scale(1.05);
+    background-color: #9DDDCB;
+}
+
+/* 애니메이션 */
+.anim-on-load {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.anim-on-load.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 20px;
+        justify-content: center;
+    }
+    .title {
+        font-size: 28px;
+    }
+    .subtitle {
+        font-size: 16px;
+        margin-bottom: 40px;
+    }
+    .action-btn h3 {
+        font-size: 20px;
+    }
+    .action-btn p {
+        font-size: 15px;
+    }
+    .back-button {
+        margin-top: 50px;
+    }
+}

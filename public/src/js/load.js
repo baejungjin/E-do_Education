@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- UI 요소 ---
     const fileList = document.querySelector('.file-list');
     const fileInput = document.getElementById('new-file-upload');
     const fileItemTemplate = document.getElementById('file-item-template');
@@ -62,12 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateFileItem(item, fileId, statusText, isError = false) {
         item.querySelector('.file-date').textContent = statusText;
         if (isError) {
-            item.classList.add('error');
+            item.classList.add('error'); // (CSS에 .error 스타일 추가 필요)
         } else if (fileId) {
-            // 1. localStorage에 fileId 저장
-            localStorage.setItem('currentFileId', fileId);
-            // 2. study.html로 이동
-            window.location.href = `study.html?fileId=${fileId}`;
+            item.dataset.id = fileId; // 실제 fileId로 업데이트
+            addNavigationFunctionality(item, fileId);
         }
     }
 
