@@ -71,8 +71,8 @@ body {
 .secondary-btn { background-color: #C8E6C9; color: #2E7D32; }
 .secondary-btn:hover { background-color: #A5D6A7; }
 
-/* 돌아가기 버튼 */
-.back-button { position: absolute; top: 0; right: 0; padding: 10px 18px; background-color: #E9ECEF; color: #555; text-decoration: none; font-weight: 700; border-radius: 12px; font-size: 15px; transition: all 0.2s ease; }
+/* 돌아가기 버튼 - 화면 좌상단 고정으로 헤더와 겹침 방지 */
+.back-button { position: fixed; top: 20px; left: 20px; padding: 10px 18px; background-color: #E9ECEF; color: #555; text-decoration: none; font-weight: 700; border-radius: 12px; font-size: 15px; transition: all 0.2s ease; z-index: 1000; }
 .back-button:hover { background-color: #DEE2E6; }
 
 /* 반응형 */
@@ -81,5 +81,6 @@ body {
 }
 @media (max-width: 768px) {
     body { padding-top: 80px; }
+    .back-button { top: 16px; left: 16px; }
     .button-row { flex-direction: column; }
 }
