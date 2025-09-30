@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 초기화 --- //
     async function initialize() {
-        // 마이크 권한 요청
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         } catch (error) {
@@ -28,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 지문 텍스트 로딩
         const fileId = new URLSearchParams(window.location.search).get('fileId');
         if (!fileId) {
             passageDisplay.innerHTML = '<p style="color: red;">오류: 파일 ID를 찾을 수 없습니다.</p>';
@@ -70,6 +68,28 @@ document.addEventListener('DOMContentLoaded', () => {
         retryBtn.addEventListener('click', () => startRecording());
     }
 
+    // --- 문장 표시 로직 ---
+    function showNextSentence() {
+        if (currentIndex >= sentences.length - 1) {
+            nextSentenceBtn.textContent = "모든 문장을 다 읽었어요!";
+            nextSentenceBtn.disabled = true;
+            return;
+        }
+        currentIndex++;
+        updateSentenceStyles();
+    }
+
+    function updateSentenceStyles() {
+        passageDisplay.querySelectorAll('.sentence').forEach((el, index) => {
+            el.classList.remove('current', 'previous', 'visible');
+            if (index < currentIndex) {
+                el.classList.add('previous', 'visible');
+            } else if (index === currentIndex) {
+                el.classList.add('current', 'visible');
+            }
+        });
+    }
+
     // --- 녹음 및 STT 로직 ---
     function toggleRecording() {
         if (isRecording) stopRecording();
@@ -90,24 +110,20 @@ document.addEventListener('DOMContentLoaded', () => {
             feedbackMessage.textContent = "듣고 있어요...";
             mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
             mediaRecorder.ondataavailable = event => {
-                if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
-                    socket.send(event.data);
-                }
+                if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) socket.send(event.data);
             };
             mediaRecorder.onstop = () => {
                 if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'stop' }));
             };
-            mediaRecorder.start(500); // 0.5초 간격으로 데이터 전송
+            mediaRecorder.start(500);
         };
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.type === 'transcript' && data.final) {
-                // 최종 결과 도착 시
                 stopRecording();
                 checkSimilarity(data.text);
             } else if (data.type === 'transcript') {
-                // 중간 결과 표시 (선택사항)
                 feedbackMessage.textContent = `"${data.text}"`;
             }
         };
@@ -118,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         socket.onclose = () => {
-            if (isRecording) stopRecording(); // 비정상 종료 시 정리
+            if (isRecording) stopRecording();
         };
     }
 
@@ -131,9 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function checkSimilarity(transcribedText) {
         const originalSentence = sentences[currentIndex].trim();
-        // 간단한 유사도 검사 (실제로는 더 정교한 로직 필요)
         const similarity = (originalSentence.includes(transcribedText.slice(0, 5)));
-        
         if (similarity) {
             feedbackMessage.textContent = "잘했어요! 👏";
         } else {
@@ -146,10 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
         feedbackMessage.innerHTML = `😢 ${message}`;
         retryBtn.classList.add('active');
     }
-
-    // --- 문장 표시 로직 (이전과 동일) ---
-    function showNextSentence() { /* ... */ }
-    function updateSentenceStyles() { /* ... */ }
 
     // --- 앱 시작 ---
     initialize();
