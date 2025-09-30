@@ -37,29 +37,6 @@
             </section>
         </main>
     </div>
-    <script>
-        const optionButtons = document.querySelectorAll('.option-btn');
-        const submitBtn = document.getElementById('submit-btn');
-        let selectedButton = null;
-        optionButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                if (selectedButton) {
-                    selectedButton.classList.remove('selected');
-                }
-                button.classList.add('selected');
-                selectedButton = button;
-                submitBtn.disabled = false;
-            });
-        });
-        submitBtn.addEventListener('click', () => {
-            if (!selectedButton) return;
-            const isCorrect = selectedButton.getAttribute('data-answer') === 'correct';
-            if (isCorrect) {
-                window.location.href = 'right.html';
-            } else {
-                window.location.href = 'wrong.html';
-            }
-        });
-    </script>
+    <script src="src/js/problemsolve.js"></script>
 </body>
 </html>
