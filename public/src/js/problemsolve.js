@@ -126,12 +126,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectedButton = null;
         submitBtn.disabled = true;
 
+        // 일부 응답에서 answerIndex가 1-based로 오는 경우를 방어적으로 보정
+        const rawIdx = Number(question.answerIndex);
+        let correctIndex = rawIdx;
+        if (!(rawIdx >= 0 && rawIdx < question.choices.length) && (rawIdx > 0 && rawIdx <= question.choices.length)) {
+            correctIndex = rawIdx - 1;
+            try { console.warn('[quiz] answerIndex normalized from 1-based to 0-based:', rawIdx, '->', correctIndex); } catch {}
+        }
+
         question.choices.forEach((choice, index) => {
             const button = document.createElement('button');
             button.className = 'option-btn';
             // 번호 배지 + 체크아이콘 + 보기 텍스트로 명확한 시각/클릭 영역 제공
             button.innerHTML = `<span class="num">${index + 1}</span><span class="check-icon">✔</span><span>${choice}</span>`;
-            button.dataset.correct = index === question.answerIndex;
+            button.dataset.correct = String(index === correctIndex);
             button.addEventListener('click', () => handleOptionSelect(button));
             optionsContainer.appendChild(button);
         });
