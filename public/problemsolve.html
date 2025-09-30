@@ -3,43 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>파일 읽기</title>
+    <title>문제 풀기</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="src/css/problemsolve.css">
 </head>
 <body>
-    <a href="load.html" class="back-button">돌아가기</a>
-    
-    <div class="instruction-container">
-        <p class="instruction-text">문제를 풀어보세요</p>
-        <p class="sub-instruction-text">지문을 읽고 알맞은 답을 선택해요 ✨</p>
-    </div>
+    <div class="wrapper">
+        <header class="header">
+            <h1>문제를 풀어보세요</h1>
+            <p>지문을 읽고 알맞은 답을 선택해요 ✨</p>
+        </header>
 
-    <div class="main-content-wrapper">
-        <div class="passage-container">
-            <div class="passage-header">
-                <h2 class="passage-title">오늘의 지문</h2>
-                <hr class="divider">
-            </div>
-            <div class="passage-content">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh.</p>
-                <p>Cras ac felis adipiscing purus fermentum ornare. Mauris nonummy turpis eget felis. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus. Duis quis erat vitae risus posuere venenatis. Cras placerat accumsan nulla. Nullam rutrum. Nam vestibulum accumsan nisl. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In hac habitasse platea dictumst. In egestas, tortor eget pellentesque lacinia, sem libero volutpat magna, et bibendum ligula est vel enim. Maecenas lorem. Maecenas delor. Pellentesque sapien. Cras eleifend urna eu nulla. Ut porta diam scelerisque tortor. Praesent vitae eros. Fusce consectetuer neque eu nisl. Quisque quis justo. Sed vel lectus. Nulla in mi. Vivamus eget felis eget enim laoreet ultricies. Nullam dignissim, felis eu semper viverra, neque ligula maximus mi, vel commodo velit magna vel justo. Aliquam erat volutpat.</p>
-                <p>Integer rutrum, orci vestibulum ullamcorper ultricies, lacus quam ultricies odio, vitae placerat pede sem sit amet enim. Phasellus et lorem id felis nonummy placerat. Fusce iaculis, est quis lacinia pretium, pede metus molestie lacus, at gravida wisi ante at libero. Quisque ornare, wisi sed feugiat suscipit, nisl magna facilisis enim, id eleifend nunc wisi nec sapien. In quam. Etiam dolor quam, tincidunt a, ornare vel, cachorros vel, dolor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Ut bibendum, neque ut imperdiet laoreet, enim lacus tempus odio, eget convallis wisi enim eget quam. In menfis. Praesent turpis. Integer posuere, arcu nec faucibus fringilla, nunc est dignissim lacus, vitae semper nisl turpis vel sem. Nam lorem. In hac habitasse platea dictumst. Mauris rutrum, sem ac varius gravida, sapien dolor ullamcorper nulla, et commodo erat enim quis nulla. In sed massa. Duis imperdiet commodo dolor. Cras sodales, lorem ac bibendum iaculis, nisi eros sodales enim, vel porta lectus enim eget dolor. Duis nunc. Pellentesque sapien. Proin molestie, dolor quis egas-tas dapibus, leo quam aliquet diam, vel cursus nisi nisl sit amet tortor.</p>
-            </div>
-        </div>
-        <div class="side-container">
-            <div class="side-header">
-                <h2 class="side-title">Q1. 아이들이 들은 것은 무엇이었을까요?</h2>
-            </div>
-            <div class="options-container">
-                <button class="option-button option-color-1" onclick="window.location.href='wrong.html'">1. 오답</button>
-                <button class="option-button option-color-2" onclick="window.location.href='wrong.html'">2. 오답</button>
-                <button class="option-button option-color-3" onclick="window.location.href='right.html'">3. 정답</button>
-                <button class="option-button option-color-4" onclick="window.location.href='wrong.html'">4. 오답</button>
-                <button class="option-button option-color-5" onclick="window.location.href='wrong.html'">5. 오답</button>
-            </div>
-        </div>
-    </div>
+        <main class="content-container">
+            <section class="passage-card">
+                <h2 class="card-label">오늘의 지문 📖</h2>
+                <div class="passage-content">
+                    <p>사자는 생쥐가 고마워서 "고맙다, 이 은혜는 평생 잊지 않을게."라고 말했어요. 생쥐는 "천만에요." 하고 숲 속으로 사라졌어요. 며칠 뒤, 사자는 사냥꾼의 그물에 걸리고 말았어요. 사자가 아무리 울부짖어도 소용없었어요. 그때, 생쥐가 나타나 날카로운 이빨로 그물을 갉아 끊어주었어요. 덕분에 사자는 무사히 풀려날 수 있었답니다.</p>
+                    <p>"정말 고맙다, 작은 친구야. 네 덕분에 살았어." 사자는 진심으로 감사하며 말했어요. 생쥐는 "지난번에 저를 살려주셨잖아요. 이제 저희는 친구예요."라며 웃었어요. 그 후로 사자와 생쥐는 가장 친한 친구가 되어 숲 속에서 행복하게 지냈답니다.</p>
+                    <p>이 이야기는 우리에게 아무리 작은 존재라도 서로 도우며 살아야 한다는 교훈을 줍니다. 또한, 작은 친절이 나중에 큰 보답으로 돌아올 수 있다는 것을 보여줍니다. 우리는 모두 서로에게 소중한 친구가 될 수 있습니다.</p>
+                </div>
+            </section>
 
-    <script src="src/js/problemsolve.js" defer></script>
+            <section class="problem-card">
+                <h2 class="question-text">Q1. 사자가 위험에 처했을 때 누가 도와주었나요?</h2>
+                <div class="options-container">
+                    <button class="option-btn" data-answer="wrong"><span class="check-icon">✔</span><span>호랑이</span></button>
+                    <button class="option-btn" data-answer="correct"><span class="check-icon">✔</span><span>생쥐</span></button>
+                    <button class="option-btn" data-answer="wrong"><span class="check-icon">✔</span><span>사냥꾼</span></button>
+                    <button class="option-btn" data-answer="wrong"><span class="check-icon">✔</span><span>코끼리</span></button>
+                    <button class="option-btn" data-answer="wrong"><span class="check-icon">✔</span><span>기린</span></button>
+                </div>
+                <button id="submit-btn" class="submit-btn" disabled>제출하기</button>
+            </section>
+        </main>
+    </div>
+    <script>
+        const optionButtons = document.querySelectorAll('.option-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        let selectedButton = null;
+        optionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (selectedButton) {
+                    selectedButton.classList.remove('selected');
+                }
+                button.classList.add('selected');
+                selectedButton = button;
+                submitBtn.disabled = false;
+            });
+        });
+        submitBtn.addEventListener('click', () => {
+            if (!selectedButton) return;
+            const isCorrect = selectedButton.getAttribute('data-answer') === 'correct';
+            if (isCorrect) {
+                window.location.href = 'right.html';
+            } else {
+                window.location.href = 'wrong.html';
+            }
+        });
+    </script>
 </body>
 </html>
