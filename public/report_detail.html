@@ -22,8 +22,8 @@
         </section>
 
         <section class="chart-grid">
-            <div class="card chart-card"><h2>정답률 추이</h2><canvas id="correct-rate-chart"></canvas></div>
-            <div class="card chart-card"><h2>학습 시간 추이</h2><canvas id="study-time-chart"></canvas></div>
+            <div class="card chart-card"><h2>정답률 추이</h2><div class="chart-wrapper"><canvas id="correct-rate-chart"></canvas></div></div>
+            <div class="card chart-card"><h2>학습 시간 추이</h2><div class="chart-wrapper"><canvas id="study-time-chart"></canvas></div></div>
         </section>
 
         <section class="detail-grid">
@@ -41,5 +41,7 @@
             <a href="#" class="btn primary-btn">다음 학습 계획 세우기</a>
         </footer>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="src/js/report_detail.js"></script>
 </body>
 </html>
