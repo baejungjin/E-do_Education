@@ -9,6 +9,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.anim-on-load').forEach((el, index) => {
         setTimeout(() => el.classList.add('visible'), 100 + index * 100);
     });
+    
+    // 예시 파일 클릭 이벤트 추가
+    document.querySelectorAll('.example-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const exampleId = item.dataset.exampleId;
+            if (exampleId) {
+                handleExampleUse(exampleId, item);
+            }
+        });
+    });
+    
     document.querySelectorAll('.file-item').forEach(item => {
         addDeleteFunctionality(item.querySelector('.delete-btn'));
         // 기존 아이템은 이미 fileId가 있다고 가정하고 링크를 설정하거나, 혹은 클릭 시 API를 호출해야 함
@@ -23,6 +35,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         event.target.value = null;
     });
+
+    // --- 예시 파일 사용 처리 ---
+    async function handleExampleUse(exampleId, item) {
+        // 로딩 상태 표시
+        const originalContent = item.innerHTML;
+        item.innerHTML = `
+            <span class="icon">⏳</span>
+            <div class="file-info">
+                <p class="file-name">로딩 중...</p>
+                <p class="file-description">예시 파일을 불러오는 중입니다</p>
+            </div>
+        `;
+        item.style.pointerEvents = 'none';
+
+        try {
+            const response = await fetch(`${BASE_URL}/api/samples/${exampleId}/use`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const result = await response.json();
+            
+            if (!response.ok || !result.ok) {
+                throw new Error(result.error || '예시 파일 로딩 실패');
+            }
+
+            // 성공 시 읽기 페이지로 이동
+            window.location.href = `read.html?fileId=${result.fileId}`;
+
+        } catch (error) {
+            console.error('Example use failed:', error);
+            // 에러 상태 표시
+            item.innerHTML = `
+                <span class="icon">❌</span>
+                <div class="file-info">
+                    <p class="file-name">로딩 실패</p>
+                    <p class="file-description">다시 시도해주세요</p>
+                </div>
+            `;
+            
+            // 2초 후 원래 상태로 복구
+            setTimeout(() => {
+                item.innerHTML = originalContent;
+                item.style.pointerEvents = 'auto';
+            }, 2000);
+        }
+    }
 
     async function handleFileUpload(file) {
         const tempId = `temp-${Date.now()}`;
