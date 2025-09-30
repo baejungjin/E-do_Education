@@ -39,7 +39,7 @@ body {
     flex-grow: 1; /* 추가 */
     overflow-y: auto; /* 추가 */
     min-height: 0; /* flex-grow와 overflow를 함께 사용할 때 필요 */
-    font-family: 'Noto Serif KR', serif; /* 피치마켓체 대용 */
+    font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
     font-size: 22px;
     line-height: 1.8;
     color: #333;

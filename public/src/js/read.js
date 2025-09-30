@@ -144,6 +144,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (index < currentIndex) el.classList.add('previous', 'visible');
             else if (index === currentIndex) el.classList.add('current', 'visible');
         });
+        
+        // 현재 문장으로 자동 스크롤
+        const currentSentence = passageDisplay.querySelector('.sentence.current');
+        if (currentSentence) {
+            currentSentence.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }
     }
 
     // --- 시작 안내 오버레이 ---
