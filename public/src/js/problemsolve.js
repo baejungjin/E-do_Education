@@ -39,6 +39,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (overlay) overlay.style.display = 'none';
     }
 
+    // --- OCR 줄바꿈 정규화 ---
+    function normalizeOcrLineBreaks(raw) {
+        if (!raw) return '';
+        const unified = raw.replace(/\r/g, '');
+        const paragraphs = unified
+            .split(/\n{2,}/)
+            .map(p => p.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim())
+            .filter(Boolean);
+        return paragraphs;
+    }
+
     async function initialize() {
         const params = new URLSearchParams(window.location.search);
         const fileId = params.get('fileId');
@@ -73,9 +84,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const ocrResult = await ocrPromise;
 
             if (!ocrResult.ok) throw new Error(ocrResult.error || '지문 로딩 실패');
-            // 명세서 대응: fullText가 없을 수 있으므로 preview로 폴백
-            const passage = (ocrResult.fullText || ocrResult.preview || '').replace(/\n/g, '</p><p>');
-            passageContent.innerHTML = passage ? `<p>${passage}</p>` : '';
+            // 명세서 대응 + OCR 줄바꿈 정규화: 단일 개행은 공백, 두 줄 이상은 문단
+            const raw = (ocrResult.fullText || ocrResult.preview || '');
+            const paragraphs = normalizeOcrLineBreaks(raw);
+            passageContent.innerHTML = paragraphs.length
+                ? paragraphs.map(p => `<p>${p}</p>`).join('')
+                : '';
 
             if (!quizResult.ok) throw new Error(quizResult.error || '퀴즈 생성 실패');
             questions = Array.isArray(quizResult.questions) ? quizResult.questions : [];

@@ -47,7 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             if (!response.ok || !result.ok) throw new Error(result.error || '텍스트를 불러오지 못했습니다.');
             // 명세서에 따르면 fullText가 없을 수 있어 preview로 폴백
-            const text = result.fullText || result.preview || "";
+            const rawText = result.fullText || result.preview || "";
+            const text = normalizeOcrLineBreaks(rawText);
             setupSentences(text);
 
             // 퀴즈를 미리 받아서 캐시(세션)해 UX 향상
@@ -74,6 +75,18 @@ document.addEventListener('DOMContentLoaded', () => {
         micBtn.addEventListener('click', toggleRecording);
         retryBtn.addEventListener('click', () => startRecording());
     }
+    // --- OCR 줄바꿈 정규화 ---
+    function normalizeOcrLineBreaks(raw) {
+        if (!raw) return '';
+        const unified = raw.replace(/\r/g, '');
+        // 두 줄 이상 공백은 문단 경계로, 단일 개행은 공백으로 치환
+        const paragraphs = unified
+            .split(/\n{2,}/)
+            .map(p => p.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim())
+            .filter(Boolean);
+        return paragraphs.join('\n\n');
+    }
+
 
     // --- 문장 표시 로직 ---
     function showNextSentence() {
