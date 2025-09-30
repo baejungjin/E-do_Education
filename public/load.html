@@ -3,28 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>파일 불러오기</title>
+    <title>지문 선택</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="src/css/load.css">
 </head>
 <body>
-    <a href="study.html" class="back-button">돌아가기</a>
+    <div class="container">
+        <a href="study.html" class="back-button">돌아가기</a>
+        <header class="header">
+            <h1 class="title">지문을 선택하세요</h1>
+            <p class="subtitle">읽고 싶은 지문을 고르거나 새로 업로드할 수 있어요</p>
+        </header>
 
-    <div class="file-list"></div>
+        <main class="file-list">
+            <!-- 아래는 예시 아이템입니다. 실제로는 JS로 렌더링될 수 있습니다. -->
+            <a href="#" class="file-item anim-on-load">
+                <span class="icon">📖</span>
+                <div class="file-info">
+                    <p class="file-name">사자와 생쥐</p>
+                    <p class="file-date">2025-09-15</p>
+                </div>
+                <span class="arrow">→</span>
+            </a>
+            <a href="#" class="file-item anim-on-load">
+                <span class="icon">📖</span>
+                <div class="file-info">
+                    <p class="file-name">흥부와 놀부</p>
+                    <p class="file-date">2025-09-12</p>
+                </div>
+                <span class="arrow">→</span>
+            </a>
+            <a href="#" class="file-item anim-on-load">
+                <span class="icon">📖</span>
+                <div class="file-info">
+                    <p class="file-name">해와 달이 된 오누이</p>
+                    <p class="file-date">2025-09-10</p>
+                </div>
+                <span class="arrow">→</span>
+            </a>
+        </main>
 
-    <input type="file" id="new-file-upload" style="display: none;">
-    <label for="new-file-upload" class="upload-new-btn">+ 새 파일 업로드</label>
-
-    <template id="file-item-template">
-        <div class="uploaded-file-item">
-            <div class="file-info">
-                <div class="file-name">new_file.pdf</div>
-                <div class="file-date">업로드 날짜: 2025-09-16</div>
-            </div>
-            <button class="delete-btn">&times;</button>
-        </div>
-    </template>
+        <label for="new-file-upload" class="upload-btn anim-on-load">+ 새 파일 업로드</label>
+        <input type="file" id="new-file-upload" hidden>
+    </div>
 
     <script src="src/js/load.js"></script>
 </body>
 </html>
-<!-- Gemini CLI -->
