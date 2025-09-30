@@ -17,7 +17,7 @@ body {
     margin-bottom: 40px;
 }
 
-.header h1 { font-size: 32px; font-weight: 700; margin: 0 0 10px 0; }
+.header h1 { font-size: 34px; font-weight: 700; margin: 0 0 10px 0; }
 .header p { font-size: 18px; color: #666; margin: 0; }
 
 /* 메인 레이아웃 - Flexbox로 변경 */
@@ -54,8 +54,8 @@ body {
 
 .passage-content {
     flex-grow: 1; /* 남은 공간 모두 차지 */
-    font-size: 18px;
-    line-height: 1.8;
+    font-size: 20px;
+    line-height: 1.85;
     color: #555;
     overflow-y: auto; /* 내용이 길면 스크롤 */
 }
@@ -66,7 +66,7 @@ body {
 }
 
 .question-text {
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 700;
     line-height: 1.6;
     margin: 0 0 30px 0;
@@ -82,11 +82,11 @@ body {
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 20px;
+    padding: 22px;
     border: 1px solid transparent;
     border-radius: 16px;
     text-align: left;
-    font-size: 17px;
+    font-size: 20px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -101,20 +101,21 @@ body {
 .option-btn:nth-child(5n+4) { background-color: #FFF8E1; } /* 옐로우 */
 .option-btn:nth-child(5n+5) { background-color: #FFF0E5; } /* 오렌지 */
 
-.option-btn .check-icon { display: inline-block; font-size: 20px; margin-right: 15px; opacity: 0; transform: scale(0.5); transition: all 0.3s ease; }
+.option-btn .check-icon { display: inline-block; font-size: 22px; margin-right: 16px; opacity: 0; transform: scale(0.5); transition: all 0.3s ease; }
+.option-btn .num { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:#fff; color:#333; font-size:16px; font-weight:700; margin-right:12px; border:1px solid rgba(0,0,0,0.08); }
 .option-btn.selected { border-color: #42A5F5; background-color: #E3F2FD; color: #0D47A1; }
 .option-btn.selected .check-icon { opacity: 1; transform: scale(1); }
 
 /* 제출 버튼 */
 .submit-btn {
     width: 100%;
-    padding: 20px;
+    padding: 22px;
     margin-top: 30px;
     border: none;
     border-radius: 16px;
     background-color: #42A5F5;
     color: white;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
