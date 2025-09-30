@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const questionText = document.querySelector('.question-text');
     const optionsContainer = document.querySelector('.options-container');
     const submitBtn = document.getElementById('submit-btn');
+    const voiceText = document.getElementById('voice-text');
     const BASE_URL = 'https://e-do.onrender.com';
 
     let questions = [];
@@ -48,6 +49,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             .map(p => p.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim())
             .filter(Boolean);
         return paragraphs;
+    }
+
+    // --- 음성인식 텍스트 업데이트 ---
+    function updateVoiceText(text) {
+        if (voiceText) {
+            voiceText.textContent = text || '음성을 인식하면 여기에 텍스트가 표시됩니다.';
+        }
     }
 
     async function initialize() {
@@ -165,13 +173,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const selected = Number(selectedIndex);
         
         console.log("=== 디버깅 정보 ===");
-        console.log("선택한 인덱스 (0부터):", selected);
+        console.log("선택한 인덱스 (0부터):", selected, "타입:", typeof selected);
         console.log("선택한 번호 (1부터):", selected + 1);
-        console.log("원본 answerIndex:", question.answerIndex);
-        console.log("정답 인덱스 (0부터):", correctIndex);
+        console.log("원본 answerIndex:", question.answerIndex, "타입:", typeof question.answerIndex);
+        console.log("정답 인덱스 (0부터):", correctIndex, "타입:", typeof correctIndex);
         console.log("정답 번호 (1부터):", correctIndex + 1);
         console.log("선택지들:", question.choices);
         console.log("정답 선택지:", question.choices[correctIndex]);
+        console.log("비교 결과 (selected === correctIndex):", selected === correctIndex);
+        console.log("비교 결과 (selected == correctIndex):", selected == correctIndex);
         console.log("==================");
         
         // 정답/오답 확인 (둘 다 0부터 시작하는 인덱스)
