@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // MVP용 버튼 링크 설정
         skipToQuizBtn.href = `problemsolve.html?fileId=${fileId}`;
-        doneBtn.addEventListener('click', () => { window.location.href = `solvecomplete.html?fileId=${fileId}`; });
+        doneBtn.addEventListener('click', () => { window.location.href = `problemsolve.html?fileId=${fileId}`; });
 
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
