@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentIndex >= sentences.length - 1) {
             nextSentenceBtn.textContent = "모든 문장을 다 읽었어요!";
             nextSentenceBtn.disabled = true;
-            doneBtn.disabled = false; // '다 읽었어요' 버튼 활성화
             return;
         }
         currentIndex++;
@@ -139,6 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const similarity = (originalSentence.includes(transcribedText.slice(0, 5)));
         if (similarity) {
             feedbackMessage.textContent = "잘했어요! 👏";
+            // 마지막 문장까지 성공하면 '다 읽었어요' 버튼 활성화
+            if (currentIndex === sentences.length - 1) {
+                doneBtn.disabled = false;
+            }
         } else {
             onRecordingFail("조금 다른 것 같아요. 다시 시도해볼까요?");
         }

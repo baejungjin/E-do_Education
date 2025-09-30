@@ -62,10 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateFileItem(item, fileId, statusText, isError = false) {
         item.querySelector('.file-date').textContent = statusText;
         if (isError) {
-            item.classList.add('error'); // (CSS에 .error 스타일 추가 필요)
+            item.classList.add('error');
         } else if (fileId) {
-            item.dataset.id = fileId; // 실제 fileId로 업데이트
-            addNavigationFunctionality(item, fileId);
+            // 1. localStorage에 fileId 저장
+            localStorage.setItem('currentFileId', fileId);
+            // 2. study.html로 이동
+            window.location.href = `study.html?fileId=${fileId}`;
         }
     }
 
