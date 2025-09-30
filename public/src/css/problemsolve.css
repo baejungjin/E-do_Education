@@ -20,47 +20,11 @@ body {
 .header h1 { font-size: 32px; font-weight: 700; margin: 0 0 10px 0; }
 .header p { font-size: 18px; color: #666; margin: 0; }
 
-/* 로딩 화면 */
-#loading-screen {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #F8F9FA;
-    z-index: 100;
-    font-family: 'Pretendard', sans-serif;
-    color: #555;
-    font-size: 18px;
-}
-
-#loading-screen p {
-    margin: 0;
-}
-
-.spinner {
-    width: 50px;
-    height: 50px;
-    border: 6px solid #eee;
-    border-top: 6px solid #42A5F5;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 20px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* 메인 레이아웃 */
+/* 메인 레이아웃 - Flexbox로 변경 */
 .content-container {
     display: flex;
-    gap: 20px;
-    align-items: flex-start;
+    gap: 30px;
+    align-items: stretch; /* 핵심: 아이템 높이를 동일하게 */
 }
 
 /* 카드 공통 스타일 */
@@ -71,13 +35,9 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
 }
 
+/* 지문 박스 - 내부 스크롤을 위해 flex 구조로 변경 */
 .passage-card {
-    flex: 2;
-    min-width: 500px;
-    max-width: 700px;
-    height: 300px;
-    overflow-y: auto;
-    line-height: 1.6;
+    flex: 3; /* 3:2 비율 유지 */
     display: flex;
     flex-direction: column;
 }
@@ -89,20 +49,20 @@ body {
     margin: 0 0 20px 0;
     padding-bottom: 15px;
     border-bottom: 1px solid #F0F0F0;
-    flex-shrink: 0;
+    flex-shrink: 0; /* 줄어들지 않음 */
 }
 
 .passage-content {
-    flex-grow: 1;
-    font-size: 16px;
-    white-space: normal;
-    word-break: keep-all;
+    flex-grow: 1; /* 남은 공간 모두 차지 */
+    font-size: 18px;
+    line-height: 1.8;
     color: #555;
-    overflow-y: auto;
+    overflow-y: auto; /* 내용이 길면 스크롤 */
 }
 
+/* 문제 박스 */
 .problem-card {
-    flex: 1;
+    flex: 2; /* 3:2 비율 유지 */
 }
 
 .question-text {
@@ -123,74 +83,29 @@ body {
     align-items: center;
     width: 100%;
     padding: 20px;
-    border: 1px solid #eee;
+    border: 1px solid transparent;
     border-radius: 16px;
     text-align: left;
     font-size: 17px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
-    background-color: #F8F9FA;
 }
 
-.option-btn.selected {
-    border-color: #42A5F5;
-    background-color: #E3F2FD;
-    color: #0D47A1;
-}
+.option-btn:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); }
 
-/* --- 피드백 관련 스타일 --- */
-.option-btn.user-correct {
-    background-color: #C8E6C9;
-    border-color: #4CAF50;
-    color: #2E7D32;
-}
+/* 선택지 파스텔톤 배경 */
+.option-btn:nth-child(5n+1) { background-color: #F1FAEE; } /* 민트 */
+.option-btn:nth-child(5n+2) { background-color: #FEF4F6; } /* 핑크 */
+.option-btn:nth-child(5n+3) { background-color: #F6F2FF; } /* 라벤더 */
+.option-btn:nth-child(5n+4) { background-color: #FFF8E1; } /* 옐로우 */
+.option-btn:nth-child(5n+5) { background-color: #FFF0E5; } /* 오렌지 */
 
-.option-btn.user-incorrect {
-    background-color: #FFCDD2;
-    border-color: #F44336;
-    color: #C62828;
-}
+.option-btn .check-icon { display: inline-block; font-size: 20px; margin-right: 15px; opacity: 0; transform: scale(0.5); transition: all 0.3s ease; }
+.option-btn.selected { border-color: #42A5F5; background-color: #E3F2FD; color: #0D47A1; }
+.option-btn.selected .check-icon { opacity: 1; transform: scale(1); }
 
-.option-btn.actual-answer {
-    border: 2px solid #4CAF50;
-}
-
-.option-btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.9;
-}
-
-#feedback-container {
-    margin-top: 25px;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-}
-
-#feedback-container.correct {
-    background-color: #E8F5E9;
-    border-color: #A5D6A7;
-}
-
-#feedback-container.incorrect {
-    background-color: #FFEBEE;
-    border-color: #EF9A9A;
-}
-
-#feedback-title {
-    margin: 0 0 10px 0;
-    font-size: 18px;
-    font-weight: 700;
-}
-
-#feedback-explanation {
-    margin: 0;
-    font-size: 16px;
-    line-height: 1.6;
-}
-/* --- 끝 --- */
-
+/* 제출 버튼 */
 .submit-btn {
     width: 100%;
     padding: 20px;
@@ -208,6 +123,7 @@ body {
 .submit-btn:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(66, 165, 245, 0.3); }
 .submit-btn:disabled { background-color: #E0E0E0; cursor: not-allowed; }
 
+/* 반응형 */
 @media (max-width: 992px) {
     .content-container {
         flex-direction: column;
