@@ -149,7 +149,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectedButton = null;
         submitBtn.disabled = true;
 
-        const correctIndex = parseInt(question.answerIndex, 10);
+        // 안전하게 정답 인덱스 파싱
+        let correctIndex = parseInt(question.answerIndex, 10);
+        if (isNaN(correctIndex) || correctIndex < 0 || correctIndex >= question.choices.length) {
+            // 백엔드가 잘못 내려주면 answerText로 찾기
+            if (question.answerText) {
+                correctIndex = question.choices.findIndex(c => c.trim() === question.answerText.trim());
+            }
+        }
 
         question.choices.forEach((choice, index) => {
             const button = document.createElement('button');

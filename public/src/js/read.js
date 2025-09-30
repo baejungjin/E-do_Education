@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const retryBtn = document.getElementById('retry-btn');
     const doneBtn = document.getElementById('done-btn');
     const skipToQuizBtn = document.getElementById('skip-to-quiz-btn');
+    const voiceText = document.getElementById('voice-text');
 
     // --- 상태 및 설정 변수 ---
     const BASE_URL = 'https://e-do.onrender.com';
@@ -91,6 +92,13 @@ document.addEventListener('DOMContentLoaded', () => {
             .map(p => p.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim())
             .filter(Boolean);
         return paragraphs.join('\n\n');
+    }
+
+    // --- 음성인식 텍스트 업데이트 ---
+    function updateVoiceText(text) {
+        if (voiceText) {
+            voiceText.textContent = text || '음성을 인식하면 여기에 텍스트가 표시됩니다.';
+        }
     }
 
 
@@ -186,6 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
         recordingAnimation.classList.add('active');
         feedbackMessage.textContent = "읽고 나서 버튼을 다시 눌러주세요";
         retryBtn.classList.remove('active');
+        
+        // 음성인식 텍스트 초기화
+        updateVoiceText("음성을 인식하는 중...");
 
         socket = new WebSocket(STT_URL);
         socket.onopen = () => {
@@ -201,9 +212,11 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.type === 'transcript' && data.final) {
+                updateVoiceText(data.text);
                 checkSimilarity(data.text);
             } else if (data.type === 'transcript') {
-                // 중간 결과 표시 (선택사항)
+                // 실시간 중간 결과 표시
+                updateVoiceText(data.text);
             }
         };
         socket.onerror = (error) => {
@@ -218,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         micBtn.classList.remove('recording');
         recordingAnimation.classList.remove('active');
         feedbackMessage.textContent = "분석 중...";
+        updateVoiceText("분석 중...");
     }
 
     // --- 텍스트 유사도 유틸(완화 기준) ---
@@ -295,6 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function onRecordingFail(message) {
         feedbackMessage.innerHTML = `😢 ${message}`;
         retryBtn.classList.add('active');
+        updateVoiceText("인식 실패 - 다시 시도해주세요");
     }
 
     // --- 앱 시작 ---
