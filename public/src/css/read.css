@@ -35,7 +35,7 @@ body {
 .passage-display {
     min-height: 300px;
     font-family: 'Noto Serif KR', serif; /* 피치마켓체 대용 */
-    font-size: 22px;
+    font-size: 18px;
     line-height: 1.8;
     color: #333;
 }
