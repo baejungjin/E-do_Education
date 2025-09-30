@@ -124,35 +124,6 @@ body {
 .submit-btn:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(66, 165, 245, 0.3); }
 .submit-btn:disabled { background-color: #E0E0E0; cursor: not-allowed; }
 
-/* 음성인식 섹션 */
-.voice-recognition-section {
-    margin-top: 30px;
-    background-color: #fff;
-    border-radius: 24px;
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
-}
-
-.voice-label {
-    font-size: 20px;
-    font-weight: 700;
-    color: #333;
-    margin: 0 0 20px 0;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #F0F0F0;
-}
-
-.voice-text {
-    font-size: 18px;
-    line-height: 1.6;
-    color: #555;
-    min-height: 60px;
-    padding: 20px;
-    background-color: #F8F9FA;
-    border-radius: 12px;
-    border: 1px solid #E9ECEF;
-}
-
 /* 반응형 */
 @media (max-width: 992px) {
     .content-container {

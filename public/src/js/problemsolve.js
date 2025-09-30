@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const questionText = document.querySelector('.question-text');
     const optionsContainer = document.querySelector('.options-container');
     const submitBtn = document.getElementById('submit-btn');
-    const voiceText = document.getElementById('voice-text');
     const BASE_URL = 'https://e-do.onrender.com';
 
     let questions = [];
@@ -51,12 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return paragraphs;
     }
 
-    // --- 음성인식 텍스트 업데이트 ---
-    function updateVoiceText(text) {
-        if (voiceText) {
-            voiceText.textContent = text || '음성을 인식하면 여기에 텍스트가 표시됩니다.';
-        }
-    }
 
     async function initialize() {
         const params = new URLSearchParams(window.location.search);
