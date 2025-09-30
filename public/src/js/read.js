@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- UI 요소 --- //
+    // --- UI 요소 ---
     const passageDisplay = document.getElementById('passage-display');
     const nextSentenceBtn = document.getElementById('next-sentence-btn');
     const micBtn = document.getElementById('mic-btn');
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackMessage = document.getElementById('feedback-message');
     const retryBtn = document.getElementById('retry-btn');
 
-    // --- 상태 및 설정 변수 --- //
+    // --- 상태 및 설정 변수 ---
     const BASE_URL = 'https://e-do.onrender.com';
     const STT_URL = 'wss://e-do.onrender.com/stt';
     let sentences = [];
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let mediaRecorder;
     let mediaStream;
 
-    // --- 초기화 --- //
+    // --- 초기화 ---
     async function initialize() {
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -35,16 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             passageDisplay.innerHTML = '<p>지문을 불러오는 중입니다...</p>';
-            const response = await fetch(`${BASE_URL}/api/ocr`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fileId }),
-            });
+            const response = await fetch(`${BASE_URL}/api/ocr`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fileId }) });
             const result = await response.json();
             if (!response.ok || !result.ok) throw new Error(result.error || '텍스트를 불러오지 못했습니다.');
-
             setupSentences(result.fullText || "");
-
         } catch (error) {
             passageDisplay.innerHTML = `<p style="color: red;">오류: ${error.message}</p>`;
         }
@@ -54,14 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
         sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.length > 0);
         currentIndex = -1;
         passageDisplay.innerHTML = '';
-
         sentences.forEach(sentenceText => {
             const sentenceEl = document.createElement('span');
             sentenceEl.className = 'sentence';
             sentenceEl.textContent = sentenceText.trim();
             passageDisplay.appendChild(sentenceEl);
         });
-
         showNextSentence();
         nextSentenceBtn.addEventListener('click', showNextSentence);
         micBtn.addEventListener('click', toggleRecording);
@@ -82,15 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateSentenceStyles() {
         passageDisplay.querySelectorAll('.sentence').forEach((el, index) => {
             el.classList.remove('current', 'previous', 'visible');
-            if (index < currentIndex) {
-                el.classList.add('previous', 'visible');
-            } else if (index === currentIndex) {
-                el.classList.add('current', 'visible');
-            }
+            if (index < currentIndex) el.classList.add('previous', 'visible');
+            else if (index === currentIndex) el.classList.add('current', 'visible');
         });
     }
 
-    // --- 녹음 및 STT 로직 ---
+    // --- 녹음 및 STT 로직 (수동 시작/종료) ---
     function toggleRecording() {
         if (isRecording) stopRecording();
         else startRecording();
@@ -101,13 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
         isRecording = true;
         micBtn.classList.add('recording');
         recordingAnimation.classList.add('active');
-        feedbackMessage.textContent = "연결 중...";
+        feedbackMessage.textContent = "읽고 나서 버튼을 다시 눌러주세요";
         retryBtn.classList.remove('active');
 
         socket = new WebSocket(STT_URL);
-
         socket.onopen = () => {
-            feedbackMessage.textContent = "듣고 있어요...";
             mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
             mediaRecorder.ondataavailable = event => {
                 if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) socket.send(event.data);
@@ -121,20 +108,15 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.type === 'transcript' && data.final) {
-                stopRecording();
                 checkSimilarity(data.text);
             } else if (data.type === 'transcript') {
-                feedbackMessage.textContent = `"${data.text}"`;
+                // 중간 결과 표시 (선택사항)
             }
         };
 
         socket.onerror = (error) => {
             console.error('WebSocket Error:', error);
             onRecordingFail("서버 연결에 실패했어요.");
-        };
-
-        socket.onclose = () => {
-            if (isRecording) stopRecording();
         };
     }
 
@@ -143,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isRecording = false;
         micBtn.classList.remove('recording');
         recordingAnimation.classList.remove('active');
+        feedbackMessage.textContent = "분석 중...";
     }
 
     function checkSimilarity(transcribedText) {
@@ -156,7 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function onRecordingFail(message) {
-        stopRecording();
         feedbackMessage.innerHTML = `😢 ${message}`;
         retryBtn.classList.add('active');
     }
