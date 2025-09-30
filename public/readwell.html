@@ -3,23 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>읽기 완료</title>
+    <title>읽기 완료!</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="src/css/readwell.css">
 </head>
 <body>
-    <div class="content-wrapper">
-        <div class="star-icon">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="50,0 61,35 98,35 68,57 79,91 50,70 21,91 32,57 2,35 39,35" fill="#FFD700"/>
-            </svg>
-        </div>
-        <h1 class="main-message">잘 읽었어요!</h1>
-        <p class="sub-message">이제 문제를 풀어볼까요?</p>
-        <div class="new-box">
-            <p class="box-message">읽기를 끝까지 해낸 건 정말 멋진 일이에요</p>
-        </div>
-        <a href="problemsolve.html" class="action-button">문제 풀러 가기</a>
+    <div class="result-card">
+        <div class="icon">🎉</div>
+        <h1 class="main-message anim-fade-in">정말 잘 읽었어요!</h1>
+        <p class="sub-message">읽기를 끝까지 해낸 건 정말 멋진 일이에요 👏</p>
+        <a href="problemsolve.html" class="cta-button">문제 풀러 가기</a>
     </div>
-    <script src="src/js/readwell.js" defer></script>
+
+    <script src="src/js/readwell.js"></script>
 </body>
 </html>
