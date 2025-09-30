@@ -107,7 +107,7 @@ body {
     transform: translateX(-50%);
     width: 80%;
     max-width: 1000px;
-    z-index: 10;
+    z-index: 100; /* 다른 요소 위에 확실히 보이도록 수정 */
 }
 
 .upload-btn {

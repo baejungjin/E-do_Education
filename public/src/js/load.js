@@ -1,84 +1,80 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- 요소 가져오기 ---
     const fileList = document.querySelector('.file-list');
     const fileInput = document.getElementById('new-file-upload');
     const fileItemTemplate = document.getElementById('file-item-template');
-    const BASE_URL = 'https://e-do.onrender.com';
 
-    // --- 기존 아이템 처리 (애니메이션, 삭제 등) ---
-    // (이전 코드와 동일)
+    // --- 1. 페이지 로드 시 초기 요소 처리 ---
+    // 모든 애니메이션 대상 요소를 찾아 화면에 표시
+    const animatedElements = document.querySelectorAll('.anim-on-load');
+    animatedElements.forEach((el, index) => {
+        setTimeout(() => {
+            el.classList.add('visible');
+        }, 100 + index * 100);
+    });
 
-    // --- 새 파일 업로드 처리 ---
+    // 기존에 있던 항목들에 기능(삭제, 이동) 추가
+    const existingItems = document.querySelectorAll('.file-item');
+    existingItems.forEach(item => {
+        const deleteBtn = item.querySelector('.delete-btn');
+        if (deleteBtn) {
+            addDeleteFunctionality(deleteBtn);
+        }
+        const fileName = item.querySelector('.file-name').textContent;
+        addNavigationFunctionality(item, fileName);
+    });
+
+    // --- 2. 새 파일 업로드 이벤트 처리 ---
     fileInput.addEventListener('change', (event) => {
         const files = event.target.files;
         if (files.length > 0) {
             handleFileUpload(files[0]);
         }
-        event.target.value = null;
+        event.target.value = null; // 같은 파일 다시 선택 가능하도록 초기화
     });
 
-    async function handleFileUpload(file) {
-        const tempId = `temp-${Date.now()}`;
-        // 1. 낙관적 UI 업데이트: 먼저 화면에 아이템을 추가하고 "업로드 중..."으로 표시
-        const newItemEl = addFileToList(file.name, tempId, "업로드 중...");
-
-        // 2. 서버에 파일 업로드
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            const response = await fetch(`${BASE_URL}/api/upload`, {
-                method: 'POST',
-                body: formData,
-            });
-
-            const result = await response.json();
-
-            if (!response.ok || !result.ok) {
-                throw new Error(result.error || '업로드 실패');
-            }
-
-            // 3. 성공 시: fileId로 링크 업데이트
-            updateFileItem(newItemEl, result.fileId, "업로드 완료");
-
-        } catch (error) {
-            console.error('Upload failed:', error);
-            // 4. 실패 시: 에러 메시지 표시
-            updateFileItem(newItemEl, null, `실패: ${error.message}`, true);
+    // --- 3. 기능 함수들 ---
+    function handleFileUpload(file) {
+        if (!fileItemTemplate) {
+            console.error('File item template not found!');
+            return;
         }
-    }
-    
-    function addFileToList(fileName, fileId, statusText) {
+        const fileName = file.name;
+        const today = new Date();
+        const dateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
         const templateClone = fileItemTemplate.content.cloneNode(true);
         const newItemEl = templateClone.querySelector('.file-item');
-        newItemEl.dataset.id = fileId;
 
         newItemEl.querySelector('.file-name').textContent = fileName;
-        newItemEl.querySelector('.file-date').textContent = statusText;
+        newItemEl.querySelector('.file-date').textContent = dateString;
 
         addDeleteFunctionality(newItemEl.querySelector('.delete-btn'));
+        addNavigationFunctionality(newItemEl, fileName);
+
         fileList.appendChild(newItemEl);
-        
-        setTimeout(() => newItemEl.classList.add('visible'), 10);
-        return newItemEl;
+
+        // 방금 추가된 아이템에 애니메이션 적용
+        setTimeout(() => {
+            newItemEl.classList.add('visible');
+        }, 10);
     }
 
-    function updateFileItem(item, fileId, statusText, isError = false) {
-        item.querySelector('.file-date').textContent = statusText;
-        if (isError) {
-            item.classList.add('error');
-        } else if (fileId) {
-            addNavigationFunctionality(item, fileId);
-        }
-    }
-
-    function addDeleteFunctionality(button) { /* 이전과 동일 */ }
-    function addNavigationFunctionality(item, fileId) {
-        item.addEventListener('click', (e) => {
+    function addDeleteFunctionality(button) {
+        button.addEventListener('click', (e) => {
             e.preventDefault();
-            window.location.href = `read.html?fileId=${fileId}`;
+            e.stopPropagation();
+            const itemToRemove = button.closest('.file-item');
+            itemToRemove.classList.remove('visible'); // fade-out
+            setTimeout(() => itemToRemove.remove(), 500); // 애니메이션 후 삭제
         });
     }
-    
-    // 기존 아이템에도 기능 할당
-    // ... (이전 코드)
+
+    function addNavigationFunctionality(item, fileName) {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            // TODO: 실제 파일 업로드 후 받은 fileId로 교체해야 합니다.
+            window.location.href = `read.html?file=${encodeURIComponent(fileName)}`;
+        });
+    }
 });
