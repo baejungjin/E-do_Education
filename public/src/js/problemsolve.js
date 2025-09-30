@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return paragraphs;
     }
 
-
     async function initialize() {
         const params = new URLSearchParams(window.location.search);
         const fileId = params.get('fileId');
@@ -62,10 +61,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             showLoading('문제를 불러오는 중...');
-            // 1) OCR는 항상 네트워크로 불러옴
-            const ocrPromise = fetch(`${BASE_URL}/api/ocr`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fileId }) }).then(res => res.json());
+            // 1) OCR
+            const ocrPromise = fetch(`${BASE_URL}/api/ocr`, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ fileId }) 
+            }).then(res => res.json());
 
-            // 2) 퀴즈는 캐시 우선, 없으면 네트워크
+            // 2) 퀴즈 (캐시 → 네트워크)
             let cached = null;
             try {
                 const raw = sessionStorage.getItem(`quizCache:${fileId}`);
@@ -76,16 +79,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (cached && Array.isArray(cached.questions) && cached.questions.length > 0) {
                 quizResult = { ok: true, questions: cached.questions };
             } else {
-                quizResult = await fetch(`${BASE_URL}/api/quiz`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fileId, level: '초급', style: '지문 이해' }) }).then(res => res.json());
+                quizResult = await fetch(`${BASE_URL}/api/quiz`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ fileId, level: '초급', style: '지문 이해' }) 
+                }).then(res => res.json());
                 if (quizResult.ok && Array.isArray(quizResult.questions) && quizResult.questions.length > 0) {
-                    try { sessionStorage.setItem(`quizCache:${fileId}`, JSON.stringify({ fileId, questions: quizResult.questions, ts: Date.now() })); } catch {}
+                    try { 
+                        sessionStorage.setItem(`quizCache:${fileId}`, JSON.stringify({ fileId, questions: quizResult.questions, ts: Date.now() })); 
+                    } catch {}
                 }
             }
 
             const ocrResult = await ocrPromise;
 
             if (!ocrResult.ok) throw new Error(ocrResult.error || '지문 로딩 실패');
-            // 명세서 대응 + OCR 줄바꿈 정규화: 단일 개행은 공백, 두 줄 이상은 문단
+            // OCR 줄바꿈 정규화
             const raw = (ocrResult.fullText || ocrResult.preview || '');
             const paragraphs = normalizeOcrLineBreaks(raw);
             passageContent.innerHTML = paragraphs.length
@@ -101,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // 쿼리의 question 인덱스가 있으면 해당 문항으로 이동
+            // 쿼리 인덱스 → 현재 문제
             const parsedIndex = Number(initialIndexParam);
             if (!Number.isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex < questions.length) {
                 currentQuestionIndex = parsedIndex;
@@ -109,7 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 currentQuestionIndex = 0;
             }
 
-            // 퀴즈 세션 통계 초기화(첫 문제 진입 시)
+            // 첫 문제라면 통계 초기화
             if (currentQuestionIndex === 0) {
                 try {
                     const stats = { fileId, total: questions.length, correct: 0, wrong: 0, startTs: Date.now() };
@@ -135,7 +144,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectedButton = null;
         submitBtn.disabled = true;
 
-        // answerIndex는 이미 0부터 시작하는 인덱스
         const correctIndex = Number(question.answerIndex);
 
         question.choices.forEach((choice, index) => {
@@ -143,16 +151,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             button.className = 'option-btn';
             button.innerHTML = `<span class="check-icon">✔</span><span>${choice}</span>`;
             
-            // 정답 여부 설정 (index와 correctIndex 모두 0부터 시작)
             button.dataset.correct = String(index === correctIndex);
             button.dataset.index = String(index);
             
-            button.addEventListener('click', () => handleOptionSelect(button, index));
+            // index 전달 ❌ → dataset 사용 ✅
+            button.addEventListener('click', (e) => handleOptionSelect(e.currentTarget));
             optionsContainer.appendChild(button);
         });
     }
 
-    function handleOptionSelect(button, selectedIndex) {
+    function handleOptionSelect(button) {
         if (selectedButton) {
             selectedButton.classList.remove('selected');
         }
@@ -160,10 +168,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectedButton = button;
         submitBtn.disabled = false;
         
-        // 선택한 번호와 정답 비교
         const question = questions[currentQuestionIndex];
         const correctIndex = Number(question.answerIndex);
-        const selected = Number(selectedIndex);
+        const selected = Number(button.dataset.index);
         
         console.log("=== 디버깅 정보 ===");
         console.log("선택한 인덱스 (0부터):", selected, "타입:", typeof selected);
@@ -174,10 +181,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log("선택지들:", question.choices);
         console.log("정답 선택지:", question.choices[correctIndex]);
         console.log("비교 결과 (selected === correctIndex):", selected === correctIndex);
-        console.log("비교 결과 (selected == correctIndex):", selected == correctIndex);
         console.log("==================");
         
-        // 정답/오답 확인 (둘 다 0부터 시작하는 인덱스)
         if (selected === correctIndex) {
             alert("정답");
         } else {
@@ -189,7 +194,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!selectedButton) return;
         const isCorrect = selectedButton.dataset.correct === 'true';
 
-        // 현재 문제/피드백/다음 이동 정보를 저장
         const fileId = new URLSearchParams(window.location.search).get('fileId');
         const current = questions[currentQuestionIndex] || {};
         const nextIndex = currentQuestionIndex + 1;
@@ -208,17 +212,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sessionStorage.setItem(key, JSON.stringify(stats));
             }
         } catch (e) {
-            // 세션 저장 실패는 무시하고 진행
+            // 세션 저장 실패 무시
         }
 
-        // 마지막 문제 처리: 정답이면 완료 페이지로 이동
         const isLast = nextIndex >= questions.length;
         if (isCorrect && isLast) {
             window.location.href = 'solvecomplete.html';
             return;
         }
 
-        // 정답: 다음 문제 안내 페이지, 오답: 같은 문제로 재도전 페이지
         window.location.href = isCorrect ? 'right.html' : 'wrong.html';
     });
 
