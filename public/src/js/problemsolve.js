@@ -93,7 +93,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (!quizResult.ok) throw new Error(quizResult.error || '퀴즈 생성 실패');
             questions = Array.isArray(quizResult.questions) ? quizResult.questions : [];
-            normalizeAnswerIndices(questions);
 
             if (questions.length === 0) {
                 questionText.textContent = '문제가 없습니다. 다시 시도해 주세요.';
@@ -140,7 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             button.className = 'option-btn';
             // 번호 배지 + 체크아이콘 + 보기 텍스트로 명확한 시각/클릭 영역 제공
             button.innerHTML = `<span class="num">${index + 1}</span><span class="check-icon">✔</span><span>${choice}</span>`;
-            const correctIndex = Number(question._correctIndex);
+            const correctIndex = Number(question.answerIndex);
             button.dataset.correct = String(index === correctIndex);
             button.addEventListener('click', () => handleOptionSelect(button));
             optionsContainer.appendChild(button);
@@ -195,31 +194,3 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initialize();
 });
-
-// 정답 인덱스 정규화: 백엔드가 0-based/1-based 혼재 시 일관화
-function normalizeAnswerIndices(questions) {
-    if (!Array.isArray(questions)) return;
-    const samples = [];
-    for (const q of questions) {
-        const len = Array.isArray(q.choices) ? q.choices.length : 0;
-        const ai = Number(q.answerIndex);
-        if (!Number.isFinite(ai) || len <= 0) continue;
-        samples.push({ ai, len });
-    }
-    if (samples.length === 0) {
-        questions.forEach(q => { q._correctIndex = 0; });
-        return;
-    }
-    const countOneBasedish = samples.filter(s => s.ai >= 1 && s.ai <= s.len).length;
-    const ratioOneBasedish = countOneBasedish / samples.length;
-    const shift = ratioOneBasedish >= 0.6 ? -1 : 0; // 다수가 1..len 범위면 1-based로 간주
-    questions.forEach(q => {
-        const len = Array.isArray(q.choices) ? q.choices.length : 0;
-        let idx = Number(q.answerIndex);
-        if (!Number.isFinite(idx)) idx = 0;
-        let normalized = idx + shift;
-        if (normalized < 0) normalized = 0;
-        if (normalized > len - 1) normalized = len - 1;
-        q._correctIndex = normalized;
-    });
-}
