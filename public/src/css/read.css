@@ -1,3 +1,11 @@
+/* 폰트 정의 */
+@font-face {
+    font-family: 'PeachMarket';
+    src: url('../fonts/PeachMarket-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* 기본 & 폰트 설정 */
 body {
     background-color: #F8F9FA;
@@ -39,7 +47,7 @@ body {
     flex-grow: 1; /* 추가 */
     overflow-y: auto; /* 추가 */
     min-height: 0; /* flex-grow와 overflow를 함께 사용할 때 필요 */
-    font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
+    font-family: 'PeachMarket', 'Pretendard', sans-serif;
     font-size: 22px;
     line-height: 1.8;
     color: #333;
@@ -157,8 +165,9 @@ body {
 }
 
 .voice-label {
+    font-family: 'PeachMarket', 'Pretendard', sans-serif;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 400;
     color: #333;
     margin: 0 0 15px 0;
     padding-bottom: 10px;
@@ -166,7 +175,9 @@ body {
 }
 
 .voice-text {
+    font-family: 'PeachMarket', 'Pretendard', sans-serif;
     font-size: 16px;
+    font-weight: 400;
     line-height: 1.5;
     color: #555;
     min-height: 50px;

@@ -1,3 +1,11 @@
+/* 폰트 정의 */
+@font-face {
+    font-family: 'PeachMarket';
+    src: url('../fonts/PeachMarket-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* 기본 설정 */
 body {
     background-color: #F8F9FA;
@@ -54,6 +62,7 @@ body {
 
 .passage-content {
     flex-grow: 1; /* 남은 공간 모두 차지 */
+    font-family: 'PeachMarket', 'Pretendard', sans-serif;
     font-size: 20px;
     line-height: 1.85;
     color: #555;
