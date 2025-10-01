@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', async () => {
+ㅈdocument.addEventListener('DOMContentLoaded', async () => {
     const passageContent = document.querySelector('.passage-content');
     const questionText = document.querySelector('.question-text');
     const optionsContainer = document.querySelector('.options-container');
@@ -178,6 +178,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         button.classList.add('selected');
         selectedButton = button;
         submitBtn.disabled = false;
+        
+        // 디버깅 로그 추가
+        const question = questions[currentQuestionIndex];
+        const selectedIndex = parseInt(button.dataset.index, 10);
+        const correctIndex = parseInt(question.answerIndex, 10);
+        
+        console.log("=== 선택 디버깅 ===");
+        console.log("선택한 인덱스:", selectedIndex);
+        console.log("정답 인덱스:", correctIndex);
+        console.log("선택한 번호 (1부터):", selectedIndex + 1);
+        console.log("정답 번호 (1부터):", correctIndex + 1);
+        console.log("원본 answerIndex:", question.answerIndex);
+        console.log("비교 결과:", selectedIndex === correctIndex);
+        console.log("==================");
     }
 
     // --- 제출 처리 ---
