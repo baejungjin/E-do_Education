@@ -1,4 +1,4 @@
-ㅈdocument.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const passageContent = document.querySelector('.passage-content');
     const questionText = document.querySelector('.question-text');
     const optionsContainer = document.querySelector('.options-container');
