@@ -3,28 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>파일 불러오기</title>
+    <title>지문 선택</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="src/css/load.css">
 </head>
 <body>
-    <a href="study.html" class="back-button">돌아가기</a>
+    <div class="container">
+        <a href="study.html" class="back-button">돌아가기</a>
+        <header class="header">
+            <h1 class="title">지문을 선택하세요</h1>
+            <p class="subtitle">읽고 싶은 지문을 고르거나 새로 업로드할 수 있어요</p>
+        </header>
 
-    <div class="file-list"></div>
-
-    <input type="file" id="new-file-upload" style="display: none;">
-    <label for="new-file-upload" class="upload-new-btn">+ 새 파일 업로드</label>
-
-    <template id="file-item-template">
-        <div class="uploaded-file-item">
-            <div class="file-info">
-                <div class="file-name">new_file.pdf</div>
-                <div class="file-date">업로드 날짜: 2025-09-16</div>
+        <!-- 예시 파일 섹션 -->
+        <section class="examples-section">
+            <h2 class="section-title">📚 예시 지문</h2>
+            <p class="section-subtitle">미리 준비된 지문으로 바로 시작해보세요</p>
+            <div class="examples-list">
+                <div class="example-item anim-on-load" data-example-id="spacesuit">
+                    <span class="icon">🚀</span>
+                    <div class="file-info">
+                        <p class="file-name">우주복 이야기</p>
+                        <p class="file-description">우주비행사가 되어보는 모험 이야기</p>
+                    </div>
+                </div>
+                <div class="example-item anim-on-load" data-example-id="story1">
+                    <span class="icon">📖</span>
+                    <div class="file-info">
+                        <p class="file-name">전래동화 모음</p>
+                        <p class="file-description">우리나라 전래동화를 모아놓은 지문</p>
+                    </div>
+                </div>
             </div>
-            <button class="delete-btn">&times;</button>
-        </div>
-    </template>
+        </section>
+
+        <!-- 업로드된 파일 섹션 -->
+        <section class="uploaded-section">
+            <h2 class="section-title">📁 내 파일</h2>
+            <p class="section-subtitle">업로드한 파일들을 관리하세요</p>
+            <main class="file-list">
+                <a href="#" class="file-item anim-on-load">
+                    <span class="icon">📖</span>
+                    <div class="file-info">
+                        <p class="file-name">사자와 생쥐</p>
+                        <p class="file-date">2025-09-15</p>
+                    </div>
+                    <button class="delete-btn">&times;</button>
+                </a>
+                <a href="#" class="file-item anim-on-load">
+                    <span class="icon">📖</span>
+                    <div class="file-info">
+                        <p class="file-name">흥부와 놀부</p>
+                        <p class="file-date">2025-09-12</p>
+                    </div>
+                    <button class="delete-btn">&times;</button>
+                </a>
+                <a href="#" class="file-item anim-on-load">
+                    <span class="icon">📖</span>
+                    <div class="file-info">
+                        <p class="file-name">해와 달이 된 오누이</p>
+                        <p class="file-date">2025-09-10</p>
+                    </div>
+                    <button class="delete-btn">&times;</button>
+                </a>
+            </main>
+        </section>
+
+        <!-- JS가 복제해서 사용할 파일 아이템 템플릿 -->
+        <template id="file-item-template">
+            <a href="#" class="file-item anim-on-load">
+                <span class="icon">📖</span>
+                <div class="file-info">
+                    <p class="file-name">template_filename.pdf</p>
+                    <p class="file-date">2025-01-01</p>
+                </div>
+                <button class="delete-btn">&times;</button>
+            </a>
+        </template>
+    </div>
+
+    <div class="upload-btn-wrapper">
+        <label for="new-file-upload" class="upload-btn anim-on-load">+ 새 파일 업로드</label>
+        <input type="file" id="new-file-upload" hidden>
+    </div>
 
     <script src="src/js/load.js"></script>
 </body>
 </html>
-<!-- Gemini CLI -->

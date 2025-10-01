@@ -4,20 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>지문 준비</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="src/css/study.css">
 </head>
 <body>
-    <div class="content-container">
-        <div class="title">학습할 지문을 준비해요</div>
-        <div class="subtitle">파일이 있으면 불러오고, 없다면 새로 추가해요</div>
+    <div class="main-container">
+        <div class="content-wrapper">
+            <h1 class="title">학습할 지문을 준비해요</h1>
+            <p class="subtitle">파일이 있으면 불러오고, 없다면 새로 추가해요</p>
+            
+            <div class="action-buttons">
+                <a href="load.html" class="action-btn anim-on-load">
+                    <h3>파일 불러오기</h3>
+                    <p>전에 학습했던 파일을 다시 학습해요</p>
+                </a>
+                <a href="#" class="action-btn anim-on-load">
+                    <h3>새 지문 추가하기</h3>
+                    <p>새로운 PDF 파일을 업로드해서 학습해요</p>
+                </a>
+            </div>
+        </div>
+        <a href="main.html" class="back-button anim-on-load">돌아가기</a>
     </div>
 
-    <div class="action-buttons">
-        <a href="load.html" class="action-btn btn-load">파일불러오기</a>
-        <input type="file" id="pdf-upload" style="display: none;">
-        <label for="pdf-upload" class="action-btn btn-add disabled">+ 새 지문 추가하기</label>
-    </div>
-
-    <a href="index.html" class="back-button">돌아가기</a>
+    <script src="src/js/study.js"></script>
 </body>
 </html>

@@ -3,33 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>퀴즈 완료!</title>
+    <title>학습 완료!</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="src/css/solvecomplete.css">
 </head>
 <body>
-    <div class="content-wrapper">
-                <div class="star-icon">🎉 오늘 공부를 끝냈어요!</div>
-        <h1 class="main-message">모든 문제를 다 풀었어요!</h1>
-        <p class="sub-message"></p>
-        <div class="summary-container">
-            <div class="summary-item summary-correct">
-                <div class="summary-label">맞힌 문제</div>
-                <div class="summary-value">--</div>
+    <div class="wrapper">
+        <header class="header">
+            <div class="icon">🎉</div>
+            <h1>오늘 공부를 끝냈어요!</h1>
+            <p>오늘의 학습 결과를 확인하고 다음 계획을 세워보세요.</p>
+        </header>
+
+        <section class="summary-grid">
+            <div class="summary-card">
+                <span class="card-icon">✅</span>
+                <div class="card-value" id="sc-correct">--</div>
+                <div class="card-label">맞힌 문제</div>
             </div>
-            <div class="summary-item summary-incorrect">
-                <div class="summary-label">틀린 문제</div>
-                <div class="summary-value">--</div>
+            <div class="summary-card">
+                <span class="card-icon">❌</span>
+                <div class="card-value" id="sc-wrong">--</div>
+                <div class="card-label">틀린 문제</div>
             </div>
-            <div class="summary-item summary-time">
-                <div class="summary-label">총 학습 시간</div>
-                <div class="summary-value">--:--</div>
+            <div class="summary-card">
+                <span class="card-icon">⏱️</span>
+                <div class="card-value" id="sc-time">--분</div>
+                <div class="card-label">총 학습 시간</div>
             </div>
-        </div>
-        <div class="new-box">
-            <p class="box-message">꾸준함이 실력의 비결이에요. 오늘도 한 걸음 성장했네요!</p>
-        </div>
-        <a href="main.html" class="action-button">복습시작</a>
-        <a href="load.html" class="action-button btn-new-study">새 지문으로 학습</a>
+        </section>
+
+        <section class="ai-feedback">
+            <h2>오늘의 피드백 ✨</h2>
+            <p>꾸준함이 실력의 비결이에요. 오늘도 한 걸음 성장했네요! 특히 이번 학습에서는 어려운 어휘 문제도 잘 해결해주었어요.</p>
+        </section>
+
+        <footer class="button-container">
+            <a href="report.html" class="cta-button secondary">리포트 보기</a>
+            <a href="load.html" class="cta-button primary">새 지문으로 학습</a>
+        </footer>
     </div>
+    <script src="src/js/solvecomplete.js"></script>
 </body>
 </html>

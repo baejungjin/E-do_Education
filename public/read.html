@@ -4,54 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>지문 읽기</title>
+    <!-- UI Font -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="stylesheet" href="src/css/read.css">
 </head>
 <body>
-    <div class="instruction-container">
-        <h1 class="instruction-text">지문을 소리내어 읽어주세요</h1>
-        <p class="sub-instruction-text">차분하게, 한 걸음씩</p>
-    </div>
+    <div class="container">
+        <main class="passage-container">
+            <h1 class="title">지문을 소리내어 읽어보세요</h1>
+            <div id="passage-display" class="passage-display">
+                <!-- 지문이 여기에 문장 단위로 추가됩니다. -->
+            </div>
+            <button id="next-sentence-btn" class="next-sentence-btn">다음 문장</button>
+        </main>
 
-    <div class="main-content-wrapper">
-        <div class="passage-container">
-            <div class="passage-header">
-                <h2 class="passage-title">오늘의 지문</h2>
+        <aside class="recorder-container">
+            <div id="recorder-box" class="recorder-box">
+                <div id="mic-btn" class="mic-btn">
+                    <span class="icon">🎤</span>
+                </div>
+                <div id="recording-animation" class="recording-animation">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+                <p id="feedback-message" class="feedback-message">마이크를 눌러 녹음을 시작하세요</p>
             </div>
-            <hr class="divider">
-            <div class="passage-content">
-                <!-- OCR 텍스트가 여기에 삽입됩니다. -->
-                <p>텍스트 변환 중...</p>
-            </div>
-        </div>
-
-        <div class="side-container">
-            <div class="side-header">
-                <h2 class="side-title">따라읽기</h2>
-                <p class="side-subtitle">마이크를 누르고 녹음을 시작하세요</p>
-            </div>
-            <div id="mic-button" class="mic-button" style="cursor: pointer;">
-                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="white"/>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2h2v2a5 5 0 0 0 10 0v-2h2z" fill="white"/>
-                </svg>
-            </div>
-            <div id="stt-status" class="feedback-text">마이크 권한을 요청하는 중...</div>
             
-            <div id="stt-preview-container" style="margin-top: 20px; min-height: 50px; width: 100%; text-align: center;">
-                <p style="font-weight: bold;">인식 중인 텍스트:</p>
-                <p id="stt-preview" style="color: #888;">...</p>
+            <!-- 음성인식 텍스트 표시 영역 -->
+            <div class="voice-recognition-section">
+                <h3 class="voice-label">🎤 음성인식 결과</h3>
+                <div class="voice-text" id="voice-text">
+                    음성을 인식하면 여기에 텍스트가 표시됩니다.
+                </div>
             </div>
-
-            <div id="stt-log-container" style="margin-top: 15px; text-align: left; width: 100%; height: 120px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px; background: #f9f9f9;">
-                <p style="font-weight: bold; margin-top: 0;">최종 인식 결과:</p>
-                <div id="stt-log"></div>
+            
+            <div id="action-buttons" class="action-buttons">
+                <button id="retry-btn" class="btn retry-btn">다시 시도하기 🔄</button>
+                <button id="done-btn" class="btn done-btn" disabled>다 읽었어요</button>
+                <a href="#" id="skip-to-quiz-btn" class="btn skip-btn">MVP: 바로 문제 풀기</a>
             </div>
-
-            <a href="readwell.html" id="done-button" class="done-button" style="background-color: #E0E0E0; cursor: not-allowed; pointer-events: none; margin-top: 15px;">다 읽었어요</a>
-        </div>
+        </aside>
     </div>
 
-    <a href="study.html" class="back-button">뒤로가기</a>
+    <!-- 원본 텍스트는 JS를 통해 동적으로 채워집니다. -->
 
     <script src="src/js/read.js"></script>
 </body>
