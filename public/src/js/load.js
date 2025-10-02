@@ -15,8 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const exampleId = item.dataset.exampleId;
+            console.log('예시 파일 클릭됨:', exampleId);
             if (exampleId) {
                 handleExampleUse(exampleId, item);
+            } else {
+                console.error('exampleId가 없습니다:', item);
             }
         });
     });
@@ -50,17 +53,21 @@ document.addEventListener('DOMContentLoaded', () => {
         item.style.pointerEvents = 'none';
 
         try {
+            console.log('API 호출 시작:', `${BASE_URL}/api/samples/${exampleId}/use`);
             const response = await fetch(`${BASE_URL}/api/samples/${exampleId}/use`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             });
+            console.log('API 응답 상태:', response.status);
             const result = await response.json();
+            console.log('API 응답 데이터:', result);
             
             if (!response.ok || !result.ok) {
                 throw new Error(result.error || '예시 파일 로딩 실패');
             }
 
             // 성공 시 읽기 페이지로 이동
+            console.log('읽기 페이지로 이동:', `read.html?fileId=${result.fileId}`);
             window.location.href = `read.html?fileId=${result.fileId}`;
 
         } catch (error) {
