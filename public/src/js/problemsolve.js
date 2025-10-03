@@ -78,8 +78,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             let quizResult;
             if (cached && Array.isArray(cached.questions) && cached.questions.length > 0) {
-                quizResult = { ok: true, questions: cached.questions };
-            } else {
+                // 캐시된 문제도 유효성 검사
+                const validCachedQuestions = cached.questions.filter(q => {
+                    return q && 
+                        q.question && 
+                        Array.isArray(q.choices) && 
+                        q.choices.length > 0 &&
+                        q.choices.every(choice => choice && choice.trim().length > 0);
+                });
+                
+                if (validCachedQuestions.length > 0) {
+                    quizResult = { ok: true, questions: validCachedQuestions };
+                    console.log('캐시된 문제 사용:', validCachedQuestions.length, '개');
+                } else {
+                    console.warn('캐시된 문제가 유효하지 않음, 새로 요청');
+                    cached = null; // 캐시 무효화
+                }
+            }
+            
+            if (!quizResult) {
                 quizResult = await fetch(`${BASE_URL}/api/quiz`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -105,13 +122,45 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? paragraphs.map(p => `<p>${p}</p>`).join('')
                 : '';
 
-            if (!quizResult.ok) throw new Error(quizResult.error || '퀴즈 생성 실패');
+            if (!quizResult.ok) {
+                console.error('퀴즈 생성 실패:', quizResult);
+                throw new Error(quizResult.error || '퀴즈 생성 실패');
+            }
+            
             questions = Array.isArray(quizResult.questions) ? quizResult.questions : [];
+            console.log('생성된 문제 수:', questions.length);
 
             if (questions.length === 0) {
                 questionText.textContent = '문제가 없습니다. 다시 시도해 주세요.';
+                optionsContainer.innerHTML = '<p style="color: red; text-align: center; padding: 20px;">문제를 생성할 수 없습니다.</p>';
                 submitBtn.disabled = true;
                 return;
+            }
+
+            // 각 문제의 유효성 검사
+            const validQuestions = questions.filter(q => {
+                const isValid = q && 
+                    q.question && 
+                    Array.isArray(q.choices) && 
+                    q.choices.length > 0 &&
+                    q.choices.every(choice => choice && choice.trim().length > 0);
+                
+                if (!isValid) {
+                    console.warn('유효하지 않은 문제:', q);
+                }
+                return isValid;
+            });
+
+            if (validQuestions.length === 0) {
+                questionText.textContent = '유효한 문제가 없습니다. 다시 시도해 주세요.';
+                optionsContainer.innerHTML = '<p style="color: red; text-align: center; padding: 20px;">문제 데이터가 올바르지 않습니다.</p>';
+                submitBtn.disabled = true;
+                return;
+            }
+
+            if (validQuestions.length < questions.length) {
+                console.warn(`${questions.length - validQuestions.length}개의 문제가 유효하지 않아 제외되었습니다.`);
+                questions = validQuestions;
             }
 
             // 인덱스 세팅
@@ -135,14 +184,42 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         } catch (error) {
             hideLoading();
+            console.error('문제 로딩 오류:', error);
             questionText.textContent = `오류: ${error.message}`;
+            optionsContainer.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <p style="color: red; margin-bottom: 15px;">문제를 불러오는 중 오류가 발생했습니다.</p>
+                    <button onclick="location.reload()" style="
+                        background: #42A5F5; 
+                        color: white; 
+                        border: none; 
+                        padding: 10px 20px; 
+                        border-radius: 8px; 
+                        cursor: pointer;
+                        font-weight: bold;
+                    ">새로고침</button>
+                </div>
+            `;
+            submitBtn.disabled = true;
         }
     }
 
     // --- 문제 표시 ---
     function displayQuestion() {
         const question = questions[currentQuestionIndex];
-        if (!question) return;
+        if (!question) {
+            questionText.textContent = '문제를 불러올 수 없습니다.';
+            return;
+        }
+
+        // 문제 데이터 유효성 검사
+        if (!question.question || !Array.isArray(question.choices) || question.choices.length === 0) {
+            console.error('잘못된 문제 데이터:', question);
+            questionText.textContent = '문제 데이터가 올바르지 않습니다. 새로고침해주세요.';
+            optionsContainer.innerHTML = '<p style="color: red; text-align: center; padding: 20px;">문제 데이터 오류</p>';
+            submitBtn.disabled = true;
+            return;
+        }
 
         questionText.textContent = `Q${currentQuestionIndex + 1}. ${question.question}`;
         optionsContainer.innerHTML = '';
@@ -156,12 +233,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (question.answerText) {
                 correctIndex = question.choices.findIndex(c => c.trim() === question.answerText.trim());
             }
+            // 여전히 유효하지 않으면 0으로 설정 (첫 번째 선택지)
+            if (isNaN(correctIndex) || correctIndex < 0 || correctIndex >= question.choices.length) {
+                correctIndex = 0;
+                console.warn('정답 인덱스를 찾을 수 없어 첫 번째 선택지를 정답으로 설정합니다.');
+            }
         }
 
         question.choices.forEach((choice, index) => {
+            // 선택지가 빈 문자열이거나 null인 경우 처리
+            const choiceText = choice || `선택지 ${index + 1}`;
             const button = document.createElement('button');
             button.className = 'option-btn';
-            button.innerHTML = `<span class="check-icon">✔</span><span>${choice}</span>`;
+            button.innerHTML = `<span class="check-icon">✔</span><span>${choiceText}</span>`;
             button.dataset.correct = (index === correctIndex).toString();
             button.dataset.index = index.toString();
 
