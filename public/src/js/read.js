@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSentenceStyles();
         // 새 문장 시작 시 다음 버튼은 비활성화하고 자동 녹음 시작
         nextSentenceBtn.disabled = true;
+        feedbackMessage.textContent = "마이크를 눌러 녹음을 시작하세요";
         startRecording();
     }
 
@@ -192,8 +193,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 녹음 및 STT 로직 (수동 시작/종료) ---
     function toggleRecording() {
-        if (isRecording) stopRecording();
-        else startRecording();
+        if (isRecording) {
+            // 문장이 성공적으로 읽힌 상태라면 다음 문장으로 넘어가기
+            if (sentencePassed) {
+                stopRecording();
+                showNextSentence();
+            } else {
+                // 아직 성공하지 못한 상태라면 녹음만 중지
+                stopRecording();
+            }
+        } else {
+            startRecording();
+        }
     }
 
     function startRecording() {
@@ -201,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isRecording = true;
         micBtn.classList.add('recording');
         recordingAnimation.classList.add('active');
-        feedbackMessage.textContent = "읽고 나서 버튼을 다시 눌러주세요";
+        feedbackMessage.textContent = "읽고 나서 마이크 버튼을 다시 눌러주세요";
         retryBtn.classList.remove('active');
         
         // 음성인식 텍스트 초기화
@@ -294,10 +305,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const pass = ratio >= (isShortSentence ? 0.6 : 0.7) || containsPrefix;
 
         if (pass) {
-            feedbackMessage.textContent = "잘했어요! 👏";
+            feedbackMessage.textContent = "잘했어요! 👏 마이크 버튼을 눌러서 다음 문장으로 넘어가세요";
             sentencePassed = true;
-            // 현재 문장 성공 시 녹음 종료
-            stopRecording();
+            // 현재 문장 성공 시 녹음은 계속 유지하고 사용자가 직접 종료하도록 함
             // 마지막 문장까지 성공하면 '다 읽었어요' 버튼 활성화
             if (currentIndex === sentences.length - 1) {
                 doneBtn.disabled = false;
@@ -305,10 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // 다음 문장으로 넘어갈 수 있도록 버튼 활성화
                 nextSentenceBtn.disabled = false;
-                // 선택: 자동으로 다음 문장으로 넘어가기 (원하면 지연 조정/제거)
-                setTimeout(() => {
-                    if (sentencePassed) showNextSentence();
-                }, 700);
+                // 자동으로 다음 문장으로 넘어가지 않음 - 사용자가 마이크 버튼을 눌러야 함
             }
         } else {
             onRecordingFail("조금 다른 것 같아요. 다시 시도해볼까요?");
