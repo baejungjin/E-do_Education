@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let mediaRecorder;
     let mediaStream;
     let fileId = null;
+    let recordingTimeout = null;
 
     // --- 초기화 ---
     async function initialize() {
@@ -115,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSentenceStyles();
         // 새 문장 시작 시 다음 버튼은 비활성화하고 자동 녹음 시작
         nextSentenceBtn.disabled = true;
+        feedbackMessage.textContent = "마이크를 눌러 녹음을 시작하세요";
         startRecording();
     }
 
@@ -192,8 +194,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 녹음 및 STT 로직 (수동 시작/종료) ---
     function toggleRecording() {
-        if (isRecording) stopRecording();
-        else startRecording();
+        if (isRecording) {
+            // 문장이 성공적으로 읽힌 상태라면 다음 문장으로 넘어가기
+            if (sentencePassed) {
+                stopRecording();
+                showNextSentence();
+            } else {
+                // 아직 성공하지 못한 상태라면 녹음만 중지
+                stopRecording();
+            }
+        } else {
+            startRecording();
+        }
     }
 
     function startRecording() {
@@ -201,11 +213,17 @@ document.addEventListener('DOMContentLoaded', () => {
         isRecording = true;
         micBtn.classList.add('recording');
         recordingAnimation.classList.add('active');
-        feedbackMessage.textContent = "읽고 나서 버튼을 다시 눌러주세요";
+        feedbackMessage.textContent = "읽고 나서 마이크 버튼을 다시 눌러주세요";
         retryBtn.classList.remove('active');
         
         // 음성인식 텍스트 초기화
         updateVoiceText("음성을 인식하는 중...");
+
+        // 기존 타임아웃 클리어
+        if (recordingTimeout) {
+            clearTimeout(recordingTimeout);
+            recordingTimeout = null;
+        }
 
         socket = new WebSocket(STT_URL);
         socket.onopen = () => {
@@ -232,15 +250,42 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('WebSocket Error:', error);
             onRecordingFail("서버 연결에 실패했어요.");
         };
+        
+        // 30초 후 자동으로 녹음 중지 (타임아웃 방지)
+        recordingTimeout = setTimeout(() => {
+            if (isRecording) {
+                console.log('녹음 타임아웃 - 자동 중지');
+                stopRecording();
+            }
+        }, 30000);
     }
 
     function stopRecording() {
-        if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+        }
         isRecording = false;
         micBtn.classList.remove('recording');
         recordingAnimation.classList.remove('active');
-        feedbackMessage.textContent = "분석 중...";
-        updateVoiceText("분석 중...");
+        
+        // 타임아웃 클리어
+        if (recordingTimeout) {
+            clearTimeout(recordingTimeout);
+            recordingTimeout = null;
+        }
+        
+        // WebSocket 연결 종료
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.close();
+        }
+        
+        // 문장이 성공적으로 읽힌 경우와 그렇지 않은 경우를 구분
+        if (sentencePassed) {
+            feedbackMessage.textContent = "잘했어요! 👏 마이크 버튼을 눌러서 다음 문장으로 넘어가세요";
+        } else {
+            feedbackMessage.textContent = "마이크를 눌러 녹음을 시작하세요";
+        }
+        updateVoiceText("음성을 인식하면 여기에 텍스트가 표시됩니다.");
     }
 
     // --- 텍스트 유사도 유틸(완화 기준) ---
@@ -294,10 +339,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const pass = ratio >= (isShortSentence ? 0.6 : 0.7) || containsPrefix;
 
         if (pass) {
-            feedbackMessage.textContent = "잘했어요! 👏";
+            feedbackMessage.textContent = "잘했어요! 👏 마이크 버튼을 눌러서 다음 문장으로 넘어가세요";
             sentencePassed = true;
-            // 현재 문장 성공 시 녹음 종료
-            stopRecording();
+            // 현재 문장 성공 시 녹음은 계속 유지하고 사용자가 직접 종료하도록 함
             // 마지막 문장까지 성공하면 '다 읽었어요' 버튼 활성화
             if (currentIndex === sentences.length - 1) {
                 doneBtn.disabled = false;
@@ -305,10 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // 다음 문장으로 넘어갈 수 있도록 버튼 활성화
                 nextSentenceBtn.disabled = false;
-                // 선택: 자동으로 다음 문장으로 넘어가기 (원하면 지연 조정/제거)
-                setTimeout(() => {
-                    if (sentencePassed) showNextSentence();
-                }, 700);
+                // 자동으로 다음 문장으로 넘어가지 않음 - 사용자가 마이크 버튼을 눌러야 함
             }
         } else {
             onRecordingFail("조금 다른 것 같아요. 다시 시도해볼까요?");
