@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let mediaRecorder;
     let mediaStream;
     let fileId = null;
+    let recordingTimeout = null;
 
     // --- 초기화 ---
     async function initialize() {
@@ -218,6 +219,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // 음성인식 텍스트 초기화
         updateVoiceText("음성을 인식하는 중...");
 
+        // 기존 타임아웃 클리어
+        if (recordingTimeout) {
+            clearTimeout(recordingTimeout);
+            recordingTimeout = null;
+        }
+
         socket = new WebSocket(STT_URL);
         socket.onopen = () => {
             mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
@@ -243,15 +250,42 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('WebSocket Error:', error);
             onRecordingFail("서버 연결에 실패했어요.");
         };
+        
+        // 30초 후 자동으로 녹음 중지 (타임아웃 방지)
+        recordingTimeout = setTimeout(() => {
+            if (isRecording) {
+                console.log('녹음 타임아웃 - 자동 중지');
+                stopRecording();
+            }
+        }, 30000);
     }
 
     function stopRecording() {
-        if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+        }
         isRecording = false;
         micBtn.classList.remove('recording');
         recordingAnimation.classList.remove('active');
-        feedbackMessage.textContent = "분석 중...";
-        updateVoiceText("분석 중...");
+        
+        // 타임아웃 클리어
+        if (recordingTimeout) {
+            clearTimeout(recordingTimeout);
+            recordingTimeout = null;
+        }
+        
+        // WebSocket 연결 종료
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.close();
+        }
+        
+        // 문장이 성공적으로 읽힌 경우와 그렇지 않은 경우를 구분
+        if (sentencePassed) {
+            feedbackMessage.textContent = "잘했어요! 👏 마이크 버튼을 눌러서 다음 문장으로 넘어가세요";
+        } else {
+            feedbackMessage.textContent = "마이크를 눌러 녹음을 시작하세요";
+        }
+        updateVoiceText("음성을 인식하면 여기에 텍스트가 표시됩니다.");
     }
 
     // --- 텍스트 유사도 유틸(완화 기준) ---
