@@ -1,52 +1,47 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>지문 읽기</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>지문 읽기</title>
 
-    <!-- Pretendard Font -->
-    <link rel="stylesheet" as="style" crossorigin
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-    <link rel="stylesheet" href="src/css/read.css">
+  <!-- 폰트 -->
+  <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="src/css/read.css" />
 </head>
 
 <body>
-    <div class="container">
-        <main class="passage-container">
-            <h1 class="title">지문을 소리내어 읽어보세요</h1>
+  <div class="container">
+    <!-- 왼쪽: 지문 -->
+    <main class="passage-container">
+      <h1 class="title">지문을 소리내어 읽어보세요</h1>
+      <div id="passage-display" class="passage-display"></div>
+    </main>
 
-            <!-- 지문 표시 -->
-            <div id="passage-display" class="passage-display">
-                <!-- JS로 문장 단위로 추가됨 -->
-            </div>
-        </main>
+    <!-- 오른쪽: 녹음 및 안내 -->
+    <aside class="recorder-container">
+      <div id="recorder-box" class="recorder-box">
+        <!-- 안내 문구 -->
+        <p id="notice-text" class="notice-text">🎧 마이크를 눌러 녹음을 시작하세요</p>
 
-        <!-- 녹음 영역 -->
-        <aside class="recorder-container">
-            <div id="recorder-box" class="recorder-box">
-                <!-- 안내 문구 -->
-                <p id="notice-text" class="notice-text">🎧 마이크를 눌러 녹음을 시작하세요</p>
+        <!-- 마이크 버튼 -->
+        <div id="mic-btn" class="mic-btn">
+          <span class="icon">🎤</span>
+        </div>
 
-                <!-- 마이크 버튼 -->
-                <div id="mic-btn" class="mic-btn">
-                    <span class="icon">🎤</span>
-                </div>
+        <!-- 음성 인식 텍스트 -->
+        <div class="voice-text" id="voice-text">음성이 인식되면 여기에 표시됩니다.</div>
 
-                <!-- 인식 텍스트 표시 -->
-                <div class="voice-text" id="voice-text">
-                    음성을 인식하면 여기에 표시됩니다.
-                </div>
+        <!-- 완료 및 심사 버튼 -->
+        <div class="action-buttons">
+          <button id="done-btn" class="btn done-btn" disabled>다 읽었어요</button>
+          <a href="#" id="judge-skip-to-quiz-btn" class="btn skip-btn">문제로 바로 넘어가기 ⏭️</a>
+        </div>
+      </div>
+    </aside>
+  </div>
 
-                <!-- 완료/심사 버튼 -->
-                <div class="action-buttons">
-                    <button id="done-btn" class="btn done-btn" disabled>다 읽었어요</button>
-                    <a href="#" id="judge-skip-to-quiz-btn" class="btn skip-btn">문제로 바로 넘어가기 ⏭️</a>
-                </div>
-            </div>
-        </aside>
-    </div>
-
-    <script src="src/js/read.js"></script>
+  <script src="src/js/read.js"></script>
 </body>
 </html>

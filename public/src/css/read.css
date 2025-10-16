@@ -1,141 +1,137 @@
-/* 폰트 정의 */
-@font-face {
-    font-family: 'PeachMarket';
-    src: url('../fonts/PeachMarket-Regular.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-
-/* 기본 */
 body {
-    background-color: #F8F9FA;
+    background-color: #f8f9fa;
     font-family: 'Pretendard', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
-}
-
-/* 전체 컨테이너 */
-.container {
+  }
+  
+  /* 전체 */
+  .container {
     display: flex;
     gap: 40px;
     width: 90%;
     max-width: 1200px;
     padding: 40px;
-}
-
-/* 지문 영역 */
-.passage-container {
+  }
+  
+  /* 지문 영역 */
+  .passage-container {
     flex: 3;
     background: #fff;
     padding: 40px;
     border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
     height: 70vh;
-}
-
-.title {
+  }
+  
+  .title {
     font-size: 24px;
     font-weight: 700;
     margin-bottom: 20px;
-}
-
-.passage-display {
+  }
+  
+  .passage-display {
     flex-grow: 1;
     overflow-y: auto;
-    font-family: 'PeachMarket', 'Pretendard', sans-serif;
     font-size: 22px;
     line-height: 1.8;
     color: #333;
-}
-
-.passage-display .sentence {
+    height: 60vh;
+  }
+  
+  .sentence {
     display: block;
     margin-bottom: 10px;
+    opacity: 0.9;
+    font-weight: 400; /* 볼드 해제 */
     transition: all 0.3s ease;
-    opacity: 0.6;
-}
-
-.passage-display .sentence.current {
-    font-weight: 700;
-    color: #000;
+  }
+  
+  .sentence.current {
+    background: #e3f2fd;
+    padding: 6px 10px;
+    border-radius: 8px;
     opacity: 1;
-}
-
-/* 녹음기 영역 */
-.recorder-container {
+  }
+  
+  /* 녹음기 영역 */
+  .recorder-container {
     flex: 2;
-}
-
-.recorder-box {
+  }
+  
+  .recorder-box {
     background: #fff;
     border-radius: 20px;
     padding: 30px;
     text-align: center;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-}
-
-/* 안내 텍스트 */
-.notice-text {
-    font-size: 16px;
-    font-weight: 600;
-    color: #555;
+    height: 70vh; /* 지문창과 동일 높이 */
+  }
+  
+  /* 안내문 */
+  .notice-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: #444;
     margin-bottom: 24px;
-}
-
-/* 마이크 버튼 */
-.mic-btn {
+    min-height: 40px;
+  }
+  
+  /* 마이크 버튼 */
+  .mic-btn {
     width: 110px;
     height: 110px;
     border-radius: 50%;
-    background-color: #AEE5D8;
+    background-color: #aee5d8;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     transition: all 0.2s ease;
     margin-bottom: 24px;
-}
-
-.mic-btn.recording {
-    background-color: #FFB6C1;
+  }
+  
+  .mic-btn.recording {
+    background-color: #ffb6c1;
     transform: scale(1.1);
-}
-
-.mic-btn .icon {
+  }
+  
+  .mic-btn .icon {
     font-size: 48px;
-}
-
-/* 음성 텍스트 */
-.voice-text {
+  }
+  
+  /* 음성 텍스트 */
+  .voice-text {
     width: 100%;
-    min-height: 70px;
-    background: #F8F9FA;
-    border: 1px solid #E9ECEF;
+    height: 60vh; /* 지문과 높이 동일 */
+    overflow-y: auto;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
     border-radius: 12px;
     padding: 16px;
-    font-size: 15px;
+    font-size: 16px;
     color: #333;
     text-align: left;
     margin-bottom: 20px;
-}
-
-/* 버튼 영역 */
-.action-buttons {
+    scroll-behavior: smooth;
+  }
+  
+  /* 버튼 */
+  .action-buttons {
     display: flex;
     gap: 12px;
     width: 100%;
-}
-
-.btn {
+  }
+  
+  .btn {
     flex: 1;
     padding: 16px;
     border: none;
@@ -144,25 +140,26 @@ body {
     font-weight: 700;
     cursor: pointer;
     transition: background-color 0.2s;
-}
-
-.done-btn {
-    background-color: #FFD6E0;
-}
-.done-btn:hover {
-    background-color: #FAC2D1;
-}
-
-.skip-btn {
-    background-color: #90CAF9;
+  }
+  
+  .done-btn {
+    background-color: #ffd6e0;
+  }
+  .done-btn:hover {
+    background-color: #fac2d1;
+  }
+  
+  .skip-btn {
+    background-color: #90caf9;
     color: #fff;
-}
-.skip-btn:hover {
-    background-color: #64B5F6;
-}
-
-.btn:disabled {
-    background-color: #E0E0E0;
+  }
+  .skip-btn:hover {
+    background-color: #64b5f6;
+  }
+  
+  .btn:disabled {
+    background-color: #e0e0e0;
     cursor: not-allowed;
     opacity: 0.6;
-}
+  }
+  
