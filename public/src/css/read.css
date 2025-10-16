@@ -6,7 +6,7 @@
     font-style: normal;
 }
 
-/* 기본 & 폰트 설정 */
+/* 기본 */
 body {
     background-color: #F8F9FA;
     font-family: 'Pretendard', sans-serif;
@@ -17,42 +17,13 @@ body {
     margin: 0;
 }
 
+/* 전체 컨테이너 */
 .container {
     display: flex;
     gap: 40px;
     width: 90%;
     max-width: 1200px;
     padding: 40px;
-    position: relative;
-}
-
-/* 닫기 버튼 */
-.close-btn {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.9);
-    color: #666;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.close-btn:hover {
-    background-color: #ff4757;
-    color: white;
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
 }
 
 /* 지문 영역 */
@@ -62,21 +33,20 @@ body {
     padding: 40px;
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.06);
-    display: flex; /* 추가 */
-    flex-direction: column; /* 추가 */
-    height: 70vh; /* 높이 고정 */
+    display: flex;
+    flex-direction: column;
+    height: 70vh;
 }
 
 .title {
     font-size: 24px;
     font-weight: 700;
-    margin: 0 0 20px 0;
+    margin-bottom: 20px;
 }
 
 .passage-display {
-    flex-grow: 1; /* 추가 */
-    overflow-y: auto; /* 추가 */
-    min-height: 0; /* flex-grow와 overflow를 함께 사용할 때 필요 */
+    flex-grow: 1;
+    overflow-y: auto;
     font-family: 'PeachMarket', 'Pretendard', sans-serif;
     font-size: 22px;
     line-height: 1.8;
@@ -84,45 +54,22 @@ body {
 }
 
 .passage-display .sentence {
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.45s ease, transform 0.45s ease;
-    display: block; /* 문장마다 줄바꿈 */
+    display: block;
     margin-bottom: 10px;
-}
-
-.passage-display .sentence.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.passage-display .sentence.previous {
-    opacity: 0.3;
+    transition: all 0.3s ease;
+    opacity: 0.6;
 }
 
 .passage-display .sentence.current {
     font-weight: 700;
     color: #000;
+    opacity: 1;
 }
-
-.next-sentence-btn {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    margin-top: 20px;
-    border: none;
-    border-radius: 12px;
-    background: #E9ECEF;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.next-sentence-btn:hover { background: #DEE2E6; }
 
 /* 녹음기 영역 */
-.recorder-container { flex: 2; }
+.recorder-container {
+    flex: 2;
+}
 
 .recorder-box {
     background: #fff;
@@ -130,104 +77,67 @@ body {
     padding: 30px;
     text-align: center;
     box-shadow: 0 8px 25px rgba(0,0,0,0.06);
-    min-height: 350px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: flex-start;
 }
 
+/* 안내 텍스트 */
+.notice-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 24px;
+}
+
+/* 마이크 버튼 */
 .mic-btn {
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
-    background-color: #AEE5D8; /* 민트 */
+    background-color: #AEE5D8;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: transform 0.2s ease;
-}
-.mic-btn.recording { transform: scale(1.1); }
-.mic-btn .icon { font-size: 40px; }
-
-.recording-animation {
-    display: none; /* 평소엔 숨김 */
-    height: 40px;
-    margin: 20px 0;
-}
-.recording-animation.active {
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-}
-.recording-animation .bar {
-    width: 8px;
-    background-color: #AEE5D8;
-    border-radius: 4px;
-    animation: wave 1.2s infinite ease-in-out;
-}
-.recording-animation .bar:nth-child(2) { animation-delay: -1.0s; }
-.recording-animation .bar:nth-child(3) { animation-delay: -0.8s; }
-.recording-animation .bar:nth-child(4) { animation-delay: -0.6s; }
-.recording-animation .bar:nth-child(5) { animation-delay: -0.4s; }
-
-@keyframes wave {
-    0%, 100% { height: 10px; }
-    50% { height: 40px; }
+    transition: all 0.2s ease;
+    margin-bottom: 24px;
 }
 
-.feedback-message {
-    min-height: 40px;
-    font-size: 16px;
-    font-weight: 700;
-    color: #555;
-    margin-top: 20px;
+.mic-btn.recording {
+    background-color: #FFB6C1;
+    transform: scale(1.1);
 }
 
-/* 음성인식 섹션 */
-.voice-recognition-section {
-    margin-top: 20px;
-    background-color: #F8F9FA;
-    border-radius: 16px;
-    padding: 20px;
-    border: 1px solid #E9ECEF;
+.mic-btn .icon {
+    font-size: 48px;
 }
 
-.voice-label {
-    font-family: 'PeachMarket', 'Pretendard', sans-serif;
-    font-size: 16px;
-    font-weight: 400;
-    color: #333;
-    margin: 0 0 15px 0;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #DEE2E6;
-}
-
+/* 음성 텍스트 */
 .voice-text {
-    font-family: 'PeachMarket', 'Pretendard', sans-serif;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 1.5;
-    color: #555;
-    min-height: 50px;
-    padding: 15px;
-    background-color: #fff;
-    border-radius: 8px;
+    width: 100%;
+    min-height: 70px;
+    background: #F8F9FA;
     border: 1px solid #E9ECEF;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 15px;
+    color: #333;
+    text-align: left;
+    margin-bottom: 20px;
 }
 
-/* 하단 버튼 */
+/* 버튼 영역 */
 .action-buttons {
     display: flex;
     gap: 12px;
-    margin-top: 20px;
-    flex-wrap: wrap;
+    width: 100%;
 }
 
 .btn {
     flex: 1;
-    padding: 18px;
+    padding: 16px;
     border: none;
     border-radius: 12px;
     font-size: 16px;
@@ -236,27 +146,20 @@ body {
     transition: background-color 0.2s;
 }
 
-.done-btn { background-color: #FFD6E0; }
-.done-btn:hover { background-color: #FAC2D1; }
-
-.restart-reading-btn { 
-    background-color: #E8F5E8; 
-    color: #2E7D32;
+.done-btn {
+    background-color: #FFD6E0;
 }
-.restart-reading-btn:hover { background-color: #C8E6C9; }
-
-.retry-btn {
-    background-color: #E0E0E0;
-    display: none; /* 평소엔 숨김 */
+.done-btn:hover {
+    background-color: #FAC2D1;
 }
-.retry-btn.active { display: block; }
-.retry-btn:hover { background-color: #BDBDBD; }
 
 .skip-btn {
-    background-color: #90CAF9; /* 파스텔 블루 */
+    background-color: #90CAF9;
     color: #fff;
 }
-.skip-btn:hover { background-color: #64B5F6; }
+.skip-btn:hover {
+    background-color: #64B5F6;
+}
 
 .btn:disabled {
     background-color: #E0E0E0;
