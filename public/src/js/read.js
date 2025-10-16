@@ -22,7 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let mediaStream;
     let fileId = null;
     let heartbeatInterval = null;
-    let accumulatedText = ''; // 누적된 인식 텍스트 (절대 초기화하지 않음)
+    let accumulatedText = ''; // 현재 인식된 텍스트
+    let lastVoiceTime = 0; // 마지막 음성 인식 시간
+    let silenceTimeout = null; // 침묵 감지 타임아웃
 
     // --- 초기화 ---
     async function initialize() {
@@ -143,8 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
         sentencePassed = false;
         updateSentenceStyles();
         
-        // 새 문장 시작 시에만 텍스트 초기화
+        // 새 문장 시작 시 텍스트 초기화
         accumulatedText = '';
+        lastVoiceTime = 0;
         updateVoiceText("음성을 인식하면 여기에 텍스트가 표시됩니다.");
         
         // 새 문장 시작 시 마이크 버튼을 눌러야 녹음 시작
@@ -275,8 +278,16 @@ document.addEventListener('DOMContentLoaded', () => {
         updateFeedbackMessage("마이크를 눌러서 읽기를 시작하세요");
         retryBtn.classList.remove('active');
         
-        // 음성인식 텍스트는 초기화하지 않음 (누적 유지)
+        // 음성인식 텍스트 초기화
+        accumulatedText = '';
+        lastVoiceTime = Date.now();
         updateVoiceText("음성을 인식하는 중...");
+        
+        // 기존 침묵 타임아웃 클리어
+        if (silenceTimeout) {
+            clearTimeout(silenceTimeout);
+            silenceTimeout = null;
+        }
 
         // 타임아웃 제거됨
 
@@ -303,16 +314,44 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const data = JSON.parse(event.data);
                 if (data.type === 'transcript' && data.final) {
-                    // 최종 결과는 누적하여 저장
+                    // 최종 결과는 현재 텍스트로 업데이트
                     if (data.text && data.text.trim().length > 0) {
-                        accumulatedText += ' ' + data.text.trim();
+                        accumulatedText = data.text.trim();
                         updateVoiceText(accumulatedText);
+                        lastVoiceTime = Date.now();
+                        
+                        // 기존 침묵 타임아웃 클리어
+                        if (silenceTimeout) {
+                            clearTimeout(silenceTimeout);
+                            silenceTimeout = null;
+                        }
+                        
+                        // 3초 후 침묵 감지 (새롭게 인식되는 것을 방지)
+                        silenceTimeout = setTimeout(() => {
+                            if (isRecording && accumulatedText.length > 0) {
+                                console.log('침묵 감지 - 현재 텍스트 유지');
+                            }
+                        }, 3000);
                     }
                 } else if (data.type === 'transcript') {
-                    // 중간 결과는 누적하여 표시
+                    // 중간 결과는 현재 텍스트로 업데이트
                     if (data.text && data.text.trim().length > 0) {
-                        accumulatedText += ' ' + data.text.trim();
+                        accumulatedText = data.text.trim();
                         updateVoiceText(accumulatedText);
+                        lastVoiceTime = Date.now();
+                        
+                        // 기존 침묵 타임아웃 클리어
+                        if (silenceTimeout) {
+                            clearTimeout(silenceTimeout);
+                            silenceTimeout = null;
+                        }
+                        
+                        // 3초 후 침묵 감지
+                        silenceTimeout = setTimeout(() => {
+                            if (isRecording && accumulatedText.length > 0) {
+                                console.log('침묵 감지 - 현재 텍스트 유지');
+                            }
+                        }, 3000);
                     }
                 }
             } catch (error) {
@@ -364,6 +403,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (heartbeatInterval) {
             clearInterval(heartbeatInterval);
             heartbeatInterval = null;
+        }
+        
+        // 침묵 타임아웃 클리어
+        if (silenceTimeout) {
+            clearTimeout(silenceTimeout);
+            silenceTimeout = null;
         }
         
         // MediaRecorder 중지
@@ -461,7 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const containsPrefix = normOriginal.includes(normSpoken.slice(0, 4));
 
         // 단순화된 임계값 적용 (50% 이상 일치하면 통과)
-        const pass = ratio >= 0.5 || containsPrefix;
+        const pass = ratio >= 0.6 || containsPrefix;
 
         if (pass) {
             updateFeedbackMessage("잘했어요! 👏");
