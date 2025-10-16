@@ -10,6 +10,7 @@
 </head>
 <body>
     <div class="container">
+        <button id="close-btn" class="close-btn" title="지문 인식 페이지로 돌아가기">✕</button>
         <main class="passage-container">
             <h1 class="title">지문을 소리내어 읽어보세요</h1>
             <div id="passage-display" class="passage-display">
@@ -44,7 +45,8 @@
             <div id="action-buttons" class="action-buttons">
                 <button id="retry-btn" class="btn retry-btn">다시 시도하기 🔄</button>
                 <button id="done-btn" class="btn done-btn" disabled>다 읽었어요</button>
-                <a href="#" id="skip-to-quiz-btn" class="btn skip-btn">MVP: 바로 문제 풀기</a>
+                <button id="restart-reading-btn" class="btn restart-reading-btn" disabled>다시 읽기 🔄</button>
+                <a href="#" id="judge-skip-to-quiz-btn" class="btn skip-btn">문제로 바로 넘어가기 ⏭️</a>
             </div>
         </aside>
     </div>

@@ -7,8 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackMessage = document.getElementById('feedback-message');
     const retryBtn = document.getElementById('retry-btn');
     const doneBtn = document.getElementById('done-btn');
-    const skipToQuizBtn = document.getElementById('skip-to-quiz-btn');
     const voiceText = document.getElementById('voice-text');
+    const restartReadingBtn = document.getElementById('restart-reading-btn');
+    const judgeSkipToQuizBtn = document.getElementById('judge-skip-to-quiz-btn');
+    const closeBtn = document.getElementById('close-btn');
 
     // --- 상태 및 설정 변수 ---
     const BASE_URL = 'https://e-do.onrender.com';
@@ -22,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let mediaStream;
     let fileId = null;
     let recordingTimeout = null;
+    let heartbeatInterval = null;
 
     // --- 초기화 ---
     async function initialize() {
@@ -31,8 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // MVP용 버튼 링크 설정
-        skipToQuizBtn.href = `problemsolve.html?fileId=${fileId}`;
+        // 심사위원용 버튼 링크 설정
+        judgeSkipToQuizBtn.href = `problemsolve.html?fileId=${fileId}`;
         doneBtn.addEventListener('click', () => { window.location.href = `problemsolve.html?fileId=${fileId}`; });
 
         try {
@@ -82,6 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
         nextSentenceBtn.addEventListener('click', showNextSentence);
         micBtn.addEventListener('click', toggleRecording);
         retryBtn.addEventListener('click', () => startRecording());
+        restartReadingBtn.addEventListener('click', restartReading);
+        closeBtn.addEventListener('click', goBackToMain);
     }
     // --- OCR 줄바꿈 정규화 ---
     function normalizeOcrLineBreaks(raw) {
@@ -210,6 +215,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startRecording() {
         if (!mediaStream) return;
+        
+        // 기존 연결이 있으면 정리
+        if (socket) {
+            try {
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.close(1000, '새 연결을 위해 종료');
+                }
+            } catch (error) {
+                console.error('기존 WebSocket 종료 오류:', error);
+            }
+            socket = null;
+        }
+        
         isRecording = true;
         micBtn.classList.add('recording');
         recordingAnimation.classList.add('active');
@@ -227,43 +245,78 @@ document.addEventListener('DOMContentLoaded', () => {
 
         socket = new WebSocket(STT_URL);
         socket.onopen = () => {
-            mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm' });
+            mediaRecorder = new MediaRecorder(mediaStream, { 
+                mimeType: 'audio/webm',
+                audioBitsPerSecond: 128000
+            });
             mediaRecorder.ondataavailable = event => {
-                if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) socket.send(event.data);
+                if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
+                    socket.send(event.data);
+                }
             };
             mediaRecorder.onstop = () => {
-                if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'stop' }));
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({ type: 'stop' }));
+                }
             };
-            mediaRecorder.start(500);
+            // 2초 간격으로 데이터 전송하여 긴 공백 허용
+            mediaRecorder.start(2000);
         };
         socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.type === 'transcript' && data.final) {
-                updateVoiceText(data.text);
-                checkSimilarity(data.text);
-            } else if (data.type === 'transcript') {
-                // 실시간 중간 결과 표시
-                updateVoiceText(data.text);
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === 'transcript' && data.final) {
+                    updateVoiceText(data.text);
+                    checkSimilarity(data.text);
+                } else if (data.type === 'transcript') {
+                    // 실시간 중간 결과 표시
+                    updateVoiceText(data.text);
+                }
+            } catch (error) {
+                console.error('WebSocket 메시지 파싱 오류:', error);
             }
         };
         socket.onerror = (error) => {
             console.error('WebSocket Error:', error);
             onRecordingFail("서버 연결에 실패했어요.");
         };
+        socket.onclose = (event) => {
+            console.log('WebSocket 연결 종료:', event.code, event.reason);
+            if (isRecording && event.code !== 1000) {
+                // 정상 종료가 아닌 경우 재연결 시도
+                setTimeout(() => {
+                    if (isRecording) {
+                        console.log('WebSocket 재연결 시도...');
+                        startRecording();
+                    }
+                }, 1000);
+            }
+        };
         
-        // 30초 후 자동으로 녹음 중지 (타임아웃 방지)
+        // 60초 후 자동으로 녹음 중지 (타임아웃 방지) - 천천히 읽는 사람을 위해 연장
         recordingTimeout = setTimeout(() => {
             if (isRecording) {
                 console.log('녹음 타임아웃 - 자동 중지');
                 stopRecording();
             }
-        }, 30000);
+        }, 60000);
+        
+        // 연결 유지를 위한 heartbeat (10초마다)
+        heartbeatInterval = setInterval(() => {
+            if (socket && socket.readyState === WebSocket.OPEN && isRecording) {
+                try {
+                    socket.send(JSON.stringify({ type: 'heartbeat' }));
+                } catch (error) {
+                    console.error('Heartbeat 전송 오류:', error);
+                }
+            } else {
+                clearInterval(heartbeatInterval);
+                heartbeatInterval = null;
+            }
+        }, 10000);
     }
 
     function stopRecording() {
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-        }
         isRecording = false;
         micBtn.classList.remove('recording');
         recordingAnimation.classList.remove('active');
@@ -274,9 +327,31 @@ document.addEventListener('DOMContentLoaded', () => {
             recordingTimeout = null;
         }
         
-        // WebSocket 연결 종료
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.close();
+        // Heartbeat 클리어
+        if (heartbeatInterval) {
+            clearInterval(heartbeatInterval);
+            heartbeatInterval = null;
+        }
+        
+        // MediaRecorder 중지
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            try {
+                mediaRecorder.stop();
+            } catch (error) {
+                console.error('MediaRecorder 중지 오류:', error);
+            }
+        }
+        
+        // WebSocket 연결 안전하게 종료
+        if (socket) {
+            if (socket.readyState === WebSocket.OPEN) {
+                try {
+                    socket.close(1000, '정상 종료');
+                } catch (error) {
+                    console.error('WebSocket 종료 오류:', error);
+                }
+            }
+            socket = null;
         }
         
         // 문장이 성공적으로 읽힌 경우와 그렇지 않은 경우를 구분
@@ -346,9 +421,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentIndex === sentences.length - 1) {
                 doneBtn.disabled = false;
                 nextSentenceBtn.disabled = true;
+                restartReadingBtn.disabled = false; // 다시 읽기 버튼 활성화
             } else {
                 // 다음 문장으로 넘어갈 수 있도록 버튼 활성화
                 nextSentenceBtn.disabled = false;
+                restartReadingBtn.disabled = false; // 다시 읽기 버튼 활성화
                 // 자동으로 다음 문장으로 넘어가지 않음 - 사용자가 마이크 버튼을 눌러야 함
             }
         } else {
@@ -360,6 +437,44 @@ document.addEventListener('DOMContentLoaded', () => {
         feedbackMessage.innerHTML = `😢 ${message}`;
         retryBtn.classList.add('active');
         updateVoiceText("인식 실패 - 다시 시도해주세요");
+    }
+
+    // --- 다시 읽기 기능 ---
+    function restartReading() {
+        // 현재 녹음 중이면 중지
+        if (isRecording) {
+            stopRecording();
+        }
+        
+        // 첫 번째 문장부터 다시 시작
+        currentIndex = -1;
+        sentencePassed = false;
+        nextSentenceBtn.disabled = true;
+        doneBtn.disabled = true;
+        restartReadingBtn.disabled = true;
+        
+        // 문장 스타일 초기화
+        updateSentenceStyles();
+        
+        // 피드백 메시지
+        feedbackMessage.textContent = "처음부터 다시 읽어보세요";
+        updateVoiceText("음성을 인식하면 여기에 텍스트가 표시됩니다.");
+        
+        // 첫 번째 문장 표시 및 녹음 시작
+        setTimeout(() => {
+            showNextSentence();
+        }, 500);
+    }
+
+    // --- 지문 인식 페이지로 돌아가기 ---
+    function goBackToMain() {
+        // 현재 녹음 중이면 중지
+        if (isRecording) {
+            stopRecording();
+        }
+        
+        // 메인 페이지로 이동 (지문 인식 페이지)
+        window.location.href = 'main.html';
     }
 
     // --- 앱 시작 ---
