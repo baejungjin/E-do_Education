@@ -72,21 +72,20 @@ document.addEventListener('DOMContentLoaded', () => {
         doneBtn.disabled = false;
         return;
       }
-  
-      const nextSentence = document.createElement('span');
+
+      const nextSentence = document.createElement('div');
       nextSentence.className = 'sentence current';
       nextSentence.textContent = sentences[currentIndex].trim();
       passageDisplay.appendChild(nextSentence);
       
-      // 스무스한 스크롤 효과
+      // 스무스한 스크롤로 새 문장이 보이도록
       setTimeout(() => {
         nextSentence.scrollIntoView({ 
           behavior: 'smooth', 
-          block: 'center',
-          inline: 'nearest'
+          block: 'end'
         });
       }, 100);
-  
+
       accumulatedText = '';
       voiceText.textContent = '';
       noticeText.textContent = '🎧 마이크를 눌러 녹음을 시작하세요';

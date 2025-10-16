@@ -37,22 +37,19 @@ body {
   
   .passage-display {
     flex-grow: 1;
-    overflow: hidden;
+    overflow-y: auto;
     font-size: 22px;
     line-height: 1.8;
     color: #333;
     height: 60vh;
     font-family: 'PeachMarket', 'Pretendard', sans-serif;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 20px;
+    padding: 10px 20px;
+    scroll-behavior: smooth;
   }
   
   .sentence {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     opacity: 0.9;
     font-weight: 400; /* 볼드 해제 */
     transition: all 0.3s ease;
