@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- UI 요소 --- //
     const passageDisplay = document.getElementById('passage-display');
-    const nextSentenceBtn = document.getElementById('next-sentence-btn');
     const micBtn = document.getElementById('mic-btn');
     const recordingAnimation = document.getElementById('recording-animation');
     const feedbackMessage = document.getElementById('feedback-message');
@@ -80,8 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         // 시작 전 안내를 보여주고, 사용자가 시작을 누르면 첫 문장을 진행
         showStartPrompt();
-        nextSentenceBtn.disabled = true;
-        nextSentenceBtn.addEventListener('click', showNextSentence);
         micBtn.addEventListener('click', toggleRecording);
         retryBtn.addEventListener('click', () => {
             // 현재 녹음 중이면 중지
@@ -139,15 +136,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function showNextSentence() {
         // 다음 문장으로 이동 (처음 호출 포함)
         if (currentIndex >= sentences.length - 1) {
-            nextSentenceBtn.textContent = "모든 문장을 다 읽었어요!";
-            nextSentenceBtn.disabled = true;
+            updateFeedbackMessage("모든 문장을 다 읽었어요!");
             return;
         }
         currentIndex++;
         sentencePassed = false;
         updateSentenceStyles();
-        // 새 문장 시작 시 다음 버튼은 비활성화하고 마이크 버튼을 눌러야 녹음 시작
-        nextSentenceBtn.disabled = true;
+        // 새 문장 시작 시 마이크 버튼을 눌러야 녹음 시작
         updateFeedbackMessage("마이크를 눌러서 읽기를 시작하세요");
         // 자동 녹음 시작하지 않음 - 사용자가 마이크 버튼을 눌러야 함
     }
@@ -304,13 +299,17 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const data = JSON.parse(event.data);
                 if (data.type === 'transcript' && data.final) {
-                    // 최종 결과만 저장 (체크하지 않음)
-                    accumulatedText = data.text;
-                    updateVoiceText(accumulatedText);
+                    // 최종 결과는 누적하여 저장 (덮어쓰지 않음)
+                    if (data.text && data.text.trim().length > 0) {
+                        accumulatedText = data.text;
+                        updateVoiceText(accumulatedText);
+                    }
                 } else if (data.type === 'transcript') {
-                    // 중간 결과 표시 (부드럽게 업데이트)
-                    accumulatedText = data.text;
-                    updateVoiceText(accumulatedText);
+                    // 중간 결과는 누적하여 표시 (덮어쓰지 않음)
+                    if (data.text && data.text.trim().length > 0) {
+                        accumulatedText = data.text;
+                        updateVoiceText(accumulatedText);
+                    }
                 }
             } catch (error) {
                 console.error('WebSocket 메시지 파싱 오류:', error);
@@ -386,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 문장이 성공적으로 읽힌 경우와 그렇지 않은 경우를 구분
         if (sentencePassed) {
-            updateFeedbackMessage("잘했어요! 👏 다음 문장 버튼을 눌러주세요");
+            updateFeedbackMessage("잘했어요! 👏");
         } else {
             updateFeedbackMessage("다시 시도하기 버튼을 눌러주세요");
         }
@@ -433,28 +432,42 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         }
 
-        // 길이 비율 체크 (더 관대하게 조정)
+        // 길이 비율 체크 (문장을 완전히 다 읽을 때까지 엄격하게)
         const lengthRatio = spoken.length / original.length;
-        if (lengthRatio < 0.6) {
+        if (lengthRatio < 0.8) {
             onRecordingFail("문장을 끝까지 읽어주세요");
             return false;
         }
 
-        // 마지막 단어 체크
+        // 문장 완성도 체크 (마지막 단어 + 문장 부호)
         const originalWords = original.split(' ');
         const spokenWords = spoken.split(' ');
         
+        // 원본 문장의 마지막 단어에 문장 부호가 있는지 확인
+        const originalLastWord = originalWords[originalWords.length - 1];
+        const hasEndPunctuation = /[.!?]$/.test(originalLastWord);
+        
         if (originalWords.length > 1) {
-            const lastWordsCount = Math.min(3, Math.max(2, Math.floor(originalWords.length * 0.3)));
+            // 문장의 마지막 30% 단어를 체크 (최소 2개, 최대 5개)
+            const lastWordsCount = Math.min(5, Math.max(2, Math.floor(originalWords.length * 0.3)));
             const originalLastWords = originalWords.slice(-lastWordsCount).join(' ');
             const spokenLastWords = spokenWords.slice(-lastWordsCount).join(' ');
             
             if (originalLastWords.length > 0 && spokenLastWords.length > 0) {
                 const lastWordsSimilarity = similarityRatio(originalLastWords, spokenLastWords);
-                if (lastWordsSimilarity < 0.3) {
+                if (lastWordsSimilarity < 0.5) {
                     onRecordingFail("문장의 마지막 부분까지 읽어주세요");
                     return false;
                 }
+            }
+        }
+        
+        // 문장 부호가 있는 경우, 인식된 텍스트에도 문장 부호가 있는지 확인
+        if (hasEndPunctuation) {
+            const spokenLastWord = spokenWords[spokenWords.length - 1];
+            if (!/[.!?]$/.test(spokenLastWord)) {
+                onRecordingFail("문장을 끝까지 읽어주세요 (마침표 포함)");
+                return false;
             }
         }
 
@@ -500,10 +513,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // 마지막 문장까지 성공하면 '다 읽었어요' 버튼 활성화
             if (currentIndex === sentences.length - 1) {
                 doneBtn.disabled = false;
-                nextSentenceBtn.disabled = true;
             } else {
-                // 다음 문장으로 넘어갈 수 있도록 버튼 활성화
-                nextSentenceBtn.disabled = false;
+                // 자동으로 다음 문장으로 넘어가기 (2초 후)
+                setTimeout(() => {
+                    showNextSentence();
+                }, 2000);
             }
         } else {
             onRecordingFail("조금 다른 것 같아요. 다시 시도해볼까요?");
