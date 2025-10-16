@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const retryBtn = document.getElementById('retry-btn');
     const doneBtn = document.getElementById('done-btn');
     const voiceText = document.getElementById('voice-text');
-    const restartReadingBtn = document.getElementById('restart-reading-btn');
     const judgeSkipToQuizBtn = document.getElementById('judge-skip-to-quiz-btn');
     const closeBtn = document.getElementById('close-btn');
 
@@ -25,6 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let fileId = null;
     let recordingTimeout = null;
     let heartbeatInterval = null;
+    let accumulatedText = ''; // 누적된 인식 텍스트
+    let lastCheckTime = 0; // 마지막 유사도 체크 시간
+    let silenceTimeout = null; // 침묵 감지 타임아웃
+    let lastVoiceActivity = 0; // 마지막 음성 활동 시간
 
     // --- 초기화 ---
     async function initialize() {
@@ -85,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
         nextSentenceBtn.addEventListener('click', showNextSentence);
         micBtn.addEventListener('click', toggleRecording);
         retryBtn.addEventListener('click', () => startRecording());
-        restartReadingBtn.addEventListener('click', restartReading);
         closeBtn.addEventListener('click', goBackToMain);
     }
     // --- OCR 줄바꿈 정규화 ---
@@ -103,7 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 음성인식 텍스트 업데이트 ---
     function updateVoiceText(text) {
         if (voiceText) {
+            // 즉시 텍스트 업데이트하여 반응성 향상
             voiceText.textContent = text || '음성을 인식하면 여기에 텍스트가 표시됩니다.';
+            // 텍스트가 변경되면 스크롤하여 사용자가 볼 수 있도록 함
+            voiceText.scrollTop = voiceText.scrollHeight;
         }
     }
 
@@ -119,10 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
         currentIndex++;
         sentencePassed = false;
         updateSentenceStyles();
-        // 새 문장 시작 시 다음 버튼은 비활성화하고 자동 녹음 시작
+        // 새 문장 시작 시 다음 버튼은 비활성화하고 마이크 버튼을 눌러야 녹음 시작
         nextSentenceBtn.disabled = true;
         feedbackMessage.textContent = "마이크를 눌러 녹음을 시작하세요";
-        startRecording();
+        // 자동 녹음 시작하지 않음 - 사용자가 마이크 버튼을 눌러야 함
     }
 
     // --- 퀴즈 프리페치 & 캐시 ---
@@ -235,7 +240,16 @@ document.addEventListener('DOMContentLoaded', () => {
         retryBtn.classList.remove('active');
         
         // 음성인식 텍스트 초기화
+        accumulatedText = '';
+        lastCheckTime = 0;
+        lastVoiceActivity = Date.now();
         updateVoiceText("음성을 인식하는 중...");
+        
+        // 기존 침묵 타임아웃 클리어
+        if (silenceTimeout) {
+            clearTimeout(silenceTimeout);
+            silenceTimeout = null;
+        }
 
         // 기존 타임아웃 클리어
         if (recordingTimeout) {
@@ -259,18 +273,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     socket.send(JSON.stringify({ type: 'stop' }));
                 }
             };
-            // 2초 간격으로 데이터 전송하여 긴 공백 허용
-            mediaRecorder.start(2000);
+            // 1초 간격으로 데이터 전송하여 더 빠른 반응성 제공
+            mediaRecorder.start(1000);
         };
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
                 if (data.type === 'transcript' && data.final) {
-                    updateVoiceText(data.text);
-                    checkSimilarity(data.text);
+                    // 최종 결과는 누적 텍스트에 추가
+                    accumulatedText = data.text;
+                    updateVoiceText(accumulatedText);
+                    lastVoiceActivity = Date.now();
+                    checkSimilarity(accumulatedText);
                 } else if (data.type === 'transcript') {
-                    // 실시간 중간 결과 표시
-                    updateVoiceText(data.text);
+                    // 중간 결과도 누적하여 표시
+                    accumulatedText = data.text;
+                    updateVoiceText(accumulatedText);
+                    lastVoiceActivity = Date.now();
+                    
+                    // 기존 침묵 타임아웃 클리어
+                    if (silenceTimeout) {
+                        clearTimeout(silenceTimeout);
+                        silenceTimeout = null;
+                    }
+                    
+                    // 2초마다 유사도 체크 (너무 빈번한 체크 방지)
+                    const now = Date.now();
+                    if (now - lastCheckTime > 2000) {
+                        lastCheckTime = now;
+                        checkSimilarity(accumulatedText);
+                    }
+                    
+                    // 5초 후 침묵 감지 (중간에 끊어져도 계속 기다림)
+                    silenceTimeout = setTimeout(() => {
+                        if (isRecording && accumulatedText.length > 0) {
+                            console.log('침묵 감지 - 최종 체크 수행');
+                            checkSimilarity(accumulatedText);
+                        }
+                    }, 5000);
                 }
             } catch (error) {
                 console.error('WebSocket 메시지 파싱 오류:', error);
@@ -293,13 +333,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
         
-        // 60초 후 자동으로 녹음 중지 (타임아웃 방지) - 천천히 읽는 사람을 위해 연장
+        // 문장 길이에 따라 동적으로 타임아웃 설정
+        const currentSentence = sentences[currentIndex];
+        const sentenceLength = currentSentence ? currentSentence.length : 0;
+        let timeoutDuration = 90000; // 기본 90초
+        
+        if (sentenceLength > 100) {
+            timeoutDuration = 120000; // 긴 문장은 2분
+        } else if (sentenceLength > 50) {
+            timeoutDuration = 105000; // 중간 문장은 1분 45초
+        }
+        
         recordingTimeout = setTimeout(() => {
             if (isRecording) {
                 console.log('녹음 타임아웃 - 자동 중지');
                 stopRecording();
             }
-        }, 60000);
+        }, timeoutDuration);
         
         // 연결 유지를 위한 heartbeat (10초마다)
         heartbeatInterval = setInterval(() => {
@@ -331,6 +381,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (heartbeatInterval) {
             clearInterval(heartbeatInterval);
             heartbeatInterval = null;
+        }
+        
+        // 침묵 타임아웃 클리어
+        if (silenceTimeout) {
+            clearTimeout(silenceTimeout);
+            silenceTimeout = null;
         }
         
         // MediaRecorder 중지
@@ -400,33 +456,83 @@ document.addEventListener('DOMContentLoaded', () => {
         const normOriginal = normalizeText(originalSentence);
         const normSpoken = normalizeText(transcribedText);
 
-        // 너무 짧은 인식은 노이즈로 간주
-        if (normSpoken.length < 4) {
+        // 너무 짧은 인식은 노이즈로 간주 (더 관대하게 조정)
+        if (normSpoken.length < 3) {
             onRecordingFail("조금 더 길게 읽어주세요");
             return;
         }
 
-        const ratio = similarityRatio(normOriginal, normSpoken);
-        const containsPrefix = normOriginal.includes(normSpoken.slice(0, 5));
+        // 문장을 완전히 다 읽었는지 확인 (더 관대하게 조정)
+        const lengthRatio = normSpoken.length / normOriginal.length;
+        
+        // 인식된 텍스트가 원본의 60% 미만이면 아직 다 읽지 않은 것으로 간주 (70%에서 완화)
+        if (lengthRatio < 0.6) {
+            onRecordingFail("문장을 끝까지 읽어주세요");
+            return;
+        }
 
-        // 문장 길이에 따라 완화된 임계값 적용
-        const isShortSentence = normOriginal.length < 12;
-        const pass = ratio >= (isShortSentence ? 0.6 : 0.7) || containsPrefix;
+        // 문장의 끝 부분이 포함되었는지 확인 (마지막 20% 중 일부라도 포함되어야 함)
+        const originalEnd = normOriginal.slice(-Math.max(3, Math.floor(normOriginal.length * 0.2)));
+        const spokenEnd = normSpoken.slice(-Math.max(3, Math.floor(normSpoken.length * 0.2)));
+        
+        // 끝 부분이 전혀 일치하지 않으면 아직 다 읽지 않은 것으로 간주 (더 관대하게 조정)
+        if (originalEnd.length > 0 && spokenEnd.length > 0) {
+            const endSimilarity = similarityRatio(originalEnd, spokenEnd);
+            if (endSimilarity < 0.2) { // 0.3에서 0.2로 완화
+                onRecordingFail("문장의 끝까지 읽어주세요");
+                return;
+            }
+        }
+
+        const ratio = similarityRatio(normOriginal, normSpoken);
+        const containsPrefix = normOriginal.includes(normSpoken.slice(0, 4)); // 더 짧은 접두사도 허용
+
+        // 문장의 중간 부분도 확인하여 부분 인식 방지
+        const originalMiddle = normOriginal.slice(
+            Math.floor(normOriginal.length * 0.3), 
+            Math.floor(normOriginal.length * 0.7)
+        );
+        const spokenMiddle = normSpoken.slice(
+            Math.floor(normSpoken.length * 0.3), 
+            Math.floor(normSpoken.length * 0.7)
+        );
+        
+        let middleSimilarity = 0;
+        if (originalMiddle.length > 0 && spokenMiddle.length > 0) {
+            middleSimilarity = similarityRatio(originalMiddle, spokenMiddle);
+        }
+
+        // 문장 길이에 따라 더 관대한 임계값 적용
+        const isShortSentence = normOriginal.length < 15;
+        const isVeryShortSentence = normOriginal.length < 8;
+        
+        let pass;
+        if (isVeryShortSentence) {
+            // 매우 짧은 문장은 50% 이상 일치하면 통과
+            pass = ratio >= 0.5 || containsPrefix;
+        } else if (isShortSentence) {
+            // 짧은 문장은 60% 이상 일치하면 통과
+            pass = ratio >= 0.6 || containsPrefix;
+        } else {
+            // 긴 문장은 65% 이상 일치하고 중간 부분도 40% 이상 일치해야 통과
+            pass = (ratio >= 0.65 || containsPrefix) && middleSimilarity >= 0.4;
+        }
 
         if (pass) {
-            feedbackMessage.textContent = "잘했어요! 👏 마이크 버튼을 눌러서 다음 문장으로 넘어가세요";
+            feedbackMessage.textContent = "잘했어요! 👏";
             sentencePassed = true;
-            // 현재 문장 성공 시 녹음은 계속 유지하고 사용자가 직접 종료하도록 함
+            // 현재 문장 성공 시 녹음 중지
+            stopRecording();
+            
             // 마지막 문장까지 성공하면 '다 읽었어요' 버튼 활성화
             if (currentIndex === sentences.length - 1) {
                 doneBtn.disabled = false;
                 nextSentenceBtn.disabled = true;
-                restartReadingBtn.disabled = false; // 다시 읽기 버튼 활성화
             } else {
-                // 다음 문장으로 넘어갈 수 있도록 버튼 활성화
-                nextSentenceBtn.disabled = false;
-                restartReadingBtn.disabled = false; // 다시 읽기 버튼 활성화
-                // 자동으로 다음 문장으로 넘어가지 않음 - 사용자가 마이크 버튼을 눌러야 함
+                // 자동으로 다음 문장으로 넘어가기 (1초 후)
+                setTimeout(() => {
+                    showNextSentence();
+                }, 1000);
             }
         } else {
             onRecordingFail("조금 다른 것 같아요. 다시 시도해볼까요?");
@@ -439,32 +545,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateVoiceText("인식 실패 - 다시 시도해주세요");
     }
 
-    // --- 다시 읽기 기능 ---
-    function restartReading() {
-        // 현재 녹음 중이면 중지
-        if (isRecording) {
-            stopRecording();
-        }
-        
-        // 첫 번째 문장부터 다시 시작
-        currentIndex = -1;
-        sentencePassed = false;
-        nextSentenceBtn.disabled = true;
-        doneBtn.disabled = true;
-        restartReadingBtn.disabled = true;
-        
-        // 문장 스타일 초기화
-        updateSentenceStyles();
-        
-        // 피드백 메시지
-        feedbackMessage.textContent = "처음부터 다시 읽어보세요";
-        updateVoiceText("음성을 인식하면 여기에 텍스트가 표시됩니다.");
-        
-        // 첫 번째 문장 표시 및 녹음 시작
-        setTimeout(() => {
-            showNextSentence();
-        }, 500);
-    }
 
     // --- 지문 인식 페이지로 돌아가기 ---
     function goBackToMain() {
