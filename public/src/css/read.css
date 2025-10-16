@@ -42,6 +42,11 @@ body {
     line-height: 1.8;
     color: #333;
     height: 60vh;
+    font-family: 'PeachMarket', 'Pretendard', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
   
   .sentence {
@@ -50,12 +55,12 @@ body {
     opacity: 0.9;
     font-weight: 400; /* 볼드 해제 */
     transition: all 0.3s ease;
+    text-align: center;
+    width: 100%;
   }
   
   .sentence.current {
-    background: #e3f2fd;
     padding: 6px 10px;
-    border-radius: 8px;
     opacity: 1;
   }
   
@@ -97,6 +102,7 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     margin-bottom: 24px;
+    flex-shrink: 0;
   }
   
   .mic-btn.recording {
