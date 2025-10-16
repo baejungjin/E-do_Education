@@ -77,7 +77,15 @@ document.addEventListener('DOMContentLoaded', () => {
       nextSentence.className = 'sentence current';
       nextSentence.textContent = sentences[currentIndex].trim();
       passageDisplay.appendChild(nextSentence);
-      nextSentence.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // 스무스한 스크롤 효과
+      setTimeout(() => {
+        nextSentence.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'nearest'
+        });
+      }, 100);
   
       accumulatedText = '';
       voiceText.textContent = '';
