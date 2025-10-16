@@ -117,10 +117,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 음성인식 텍스트 업데이트 ---
     function updateVoiceText(text) {
         if (voiceText) {
-            // 즉시 텍스트 업데이트하여 반응성 향상
+            // 텍스트 업데이트
             voiceText.textContent = text || '음성을 인식하면 여기에 텍스트가 표시됩니다.';
             // 텍스트가 변경되면 스크롤하여 사용자가 볼 수 있도록 함
             voiceText.scrollTop = voiceText.scrollHeight;
+            
+            // 천천히 읽을 때 뚝뚝 끊기는 것을 방지하기 위해 부드러운 표시
+            if (text && text.length > 0) {
+                voiceText.style.opacity = '0.8';
+                setTimeout(() => {
+                    if (voiceText) {
+                        voiceText.style.opacity = '1';
+                    }
+                }, 100);
+            }
         }
     }
 
@@ -298,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     accumulatedText = data.text;
                     updateVoiceText(accumulatedText);
                 } else if (data.type === 'transcript') {
-                    // 중간 결과 표시 (계속 누적, 체크하지 않음)
+                    // 중간 결과 표시 (부드럽게 업데이트)
                     accumulatedText = data.text;
                     updateVoiceText(accumulatedText);
                 }
@@ -423,9 +433,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         }
 
-        // 길이 비율 체크
+        // 길이 비율 체크 (더 관대하게 조정)
         const lengthRatio = spoken.length / original.length;
-        if (lengthRatio < 0.7) {
+        if (lengthRatio < 0.6) {
             onRecordingFail("문장을 끝까지 읽어주세요");
             return false;
         }
@@ -441,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (originalLastWords.length > 0 && spokenLastWords.length > 0) {
                 const lastWordsSimilarity = similarityRatio(originalLastWords, spokenLastWords);
-                if (lastWordsSimilarity < 0.4) {
+                if (lastWordsSimilarity < 0.3) {
                     onRecordingFail("문장의 마지막 부분까지 읽어주세요");
                     return false;
                 }
@@ -465,17 +475,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const ratio = similarityRatio(normOriginal, normSpoken);
         const containsPrefix = normOriginal.includes(normSpoken.slice(0, 4));
 
-        // 문장 길이별 임계값 적용
+        // 문장 길이별 임계값 적용 (더 관대하게 조정)
         const isShortSentence = normOriginal.length < 15;
         const isVeryShortSentence = normOriginal.length < 8;
         
         let pass;
         if (isVeryShortSentence) {
-            pass = ratio >= 0.5 || containsPrefix;
+            // 매우 짧은 문장은 40% 이상 일치하면 통과
+            pass = ratio >= 0.4 || containsPrefix;
         } else if (isShortSentence) {
-            pass = ratio >= 0.6 || containsPrefix;
+            // 짧은 문장은 50% 이상 일치하면 통과
+            pass = ratio >= 0.5 || containsPrefix;
         } else {
-            pass = ratio >= 0.65 || containsPrefix;
+            // 긴 문장은 55% 이상 일치하면 통과
+            pass = ratio >= 0.55 || containsPrefix;
         }
 
         if (pass) {
