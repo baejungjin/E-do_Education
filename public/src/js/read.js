@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const judgeSkipToQuizBtn = document.getElementById('judge-skip-to-quiz-btn');
     const closeBtn = document.getElementById('close-btn');
 
-    // --- 상태 및 설정 변수 ---
+    // --- 상태 변수 --- //
     const BASE_URL = 'https://e-do.onrender.com';
     const STT_URL = 'wss://e-do.onrender.com/stt';
     let sentences = [];
@@ -23,14 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let fileId = null;
     let heartbeatInterval = null;
     let accumulatedText = '';
-    let lastVoiceTime = 0;
     let silenceTimeout = null;
 
-    // --- 초기화 ---
+    // --- 초기화 --- //
     async function initialize() {
         fileId = new URLSearchParams(window.location.search).get('fileId');
         if (!fileId) {
-            passageDisplay.innerHTML = '<p style="color: red;">오류: 파일 ID를 찾을 수 없습니다.</p>';
+            passageDisplay.innerHTML = '<p style="color:red;">오류: 파일 ID를 찾을 수 없습니다.</p>';
             return;
         }
 
@@ -39,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        } catch (error) {
+        } catch {
             updateFeedbackMessage('마이크 권한이 거부되었습니다.');
             micBtn.style.backgroundColor = '#E0E0E0';
             return;
@@ -47,72 +46,87 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             passageDisplay.innerHTML = '<p>지문을 불러오는 중입니다...</p>';
-            const response = await fetch(`${BASE_URL}/api/ocr`, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ fileId }) 
+            const res = await fetch(`${BASE_URL}/api/ocr`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fileId })
             });
-            const result = await response.json();
-            if (!response.ok || !result.ok) throw new Error(result.error || '텍스트를 불러오지 못했습니다.');
-            const rawText = result.fullText || result.preview || "";
-            const text = normalizeOcrLineBreaks(rawText);
+            const data = await res.json();
+            if (!res.ok || !data.ok) throw new Error(data.error || '텍스트를 불러오지 못했습니다.');
+            const text = normalizeOcrLineBreaks(data.fullText || data.preview || "");
             setupSentences(text);
-
             prefetchQuiz(fileId).catch(() => {});
-        } catch (error) {
-            passageDisplay.innerHTML = `<p style="color: red;">오류: ${error.message}</p>`;
+        } catch (e) {
+            passageDisplay.innerHTML = `<p style="color:red;">오류: ${e.message}</p>`;
         }
+    }
+
+    function normalizeOcrLineBreaks(raw) {
+        return raw.replace(/\r/g, '').split(/\n{2,}/)
+            .map(p => p.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim())
+            .filter(Boolean).join('\n\n');
     }
 
     function setupSentences(text) {
         sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.length > 0);
         currentIndex = -1;
         passageDisplay.innerHTML = '';
-        sentences.forEach(sentenceText => {
-            const cleaned = sentenceText
-                .replace(/\s{2,}/g, ' ')
+        sentences.forEach(s => {
+            const cleaned = s.replace(/\s{2,}/g, ' ')
                 .replace(/\s+([.,!?;:])/g, '$1')
-                .replace(/([가-힣A-Za-z])\s+([가-힣A-Za-z])/g, '$1 $2')
-                .trim();
-            const sentenceEl = document.createElement('span');
-            sentenceEl.className = 'sentence';
-            sentenceEl.textContent = cleaned;
-            passageDisplay.appendChild(sentenceEl);
+                .replace(/([가-힣A-Za-z])\s+([가-힣A-Za-z])/g, '$1 $2').trim();
+            const el = document.createElement('span');
+            el.className = 'sentence';
+            el.textContent = cleaned;
+            passageDisplay.appendChild(el);
         });
-        showStartPrompt();
+
         micBtn.addEventListener('click', toggleRecording);
         retryBtn.addEventListener('click', () => {
             if (isRecording) stopRecording();
-            setTimeout(() => startRecording(), 500);
+            setTimeout(() => startRecording(), 300);
         });
         closeBtn.addEventListener('click', goBackToMain);
+        showStartPrompt();
     }
 
-    function normalizeOcrLineBreaks(raw) {
-        if (!raw) return '';
-        const unified = raw.replace(/\r/g, '');
-        const paragraphs = unified
-            .split(/\n{2,}/)
-            .map(p => p.replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim())
-            .filter(Boolean);
-        return paragraphs.join('\n\n');
+    function showStartPrompt() {
+        const overlay = document.createElement('div');
+        overlay.className = 'start-overlay';
+        overlay.innerHTML = `
+            <div class="start-card">
+                <h3 class="start-title">지문 읽기 안내</h3>
+                <ul class="instruction-list">
+                    <li>🎤 마이크 버튼을 눌러서 읽기를 시작하세요.</li>
+                    <li>🗣 천천히, 또박또박 읽어주세요.</li>
+                    <li>⏸ 3초 이상 멈추면 자동으로 다음 문장으로 넘어갑니다.</li>
+                    <li>✅ 자동 인식이 안 될 경우, 다시 눌러 수동으로 평가할 수 있습니다.</li>
+                </ul>
+                <button class="start-btn">시작하기</button>
+            </div>`;
+        document.body.appendChild(overlay);
+        const style = document.createElement('style');
+        style.textContent = `
+        .start-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);display:flex;justify-content:center;align-items:center;z-index:9999}
+        .start-card{background:#fff;border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,0.15);padding:32px;width:min(600px,90%);font-family:Pretendard}
+        .start-title{text-align:center;font-size:22px;font-weight:700;margin-bottom:16px}
+        .instruction-list{list-style:none;padding:0;margin:0;font-size:15px;color:#555}
+        .instruction-list li{margin-bottom:8px}
+        .start-btn{display:block;margin:20px auto 0;background:#42A5F5;color:#fff;font-weight:700;border:none;padding:12px 20px;border-radius:14px;cursor:pointer;}
+        `;
+        document.head.appendChild(style);
+
+        overlay.querySelector('.start-btn').addEventListener('click', () => {
+            overlay.remove();
+            showNextSentence();
+        });
     }
 
-    function updateFeedbackMessage(message) {
-        if (feedbackMessage) feedbackMessage.textContent = message;
-    }
+    function updateFeedbackMessage(msg) { feedbackMessage.textContent = msg; }
 
     function updateVoiceText(text) {
-        if (voiceText) {
-            voiceText.textContent = text || '음성을 인식하면 여기에 텍스트가 표시됩니다.';
-            voiceText.scrollTop = voiceText.scrollHeight;
-            if (text && text.length > 0) {
-                voiceText.style.opacity = '0.8';
-                setTimeout(() => {
-                    if (voiceText) voiceText.style.opacity = '1';
-                }, 100);
-            }
-        }
+        voiceText.textContent = text || '음성을 인식하면 여기에 텍스트가 표시됩니다.';
+        voiceText.scrollTop = voiceText.scrollHeight;
     }
 
     function showNextSentence() {
@@ -122,79 +136,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         currentIndex++;
         sentencePassed = false;
-        updateSentenceStyles();
         accumulatedText = '';
-        lastVoiceTime = 0;
-        updateVoiceText("음성을 인식하면 여기에 텍스트가 표시됩니다.");
-        updateFeedbackMessage("마이크를 눌러서 읽기를 시작하세요");
-    }
-
-    async function prefetchQuiz(fileId) {
-        try {
-            const payload = { fileId, level: '초급', style: '지문 이해' };
-            const res = await fetch(`${BASE_URL}/api/quiz`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (!res.ok || !data.ok || !Array.isArray(data.questions) || data.questions.length === 0) return;
-            const cache = { fileId, questions: data.questions, ts: Date.now() };
-            sessionStorage.setItem(`quizCache:${fileId}`, JSON.stringify(cache));
-        } catch (e) {}
+        updateVoiceText('');
+        updateFeedbackMessage("마이크를 눌러서 읽기를 시작하세요.");
+        updateSentenceStyles();
     }
 
     function updateSentenceStyles() {
-        passageDisplay.querySelectorAll('.sentence').forEach((el, index) => {
+        passageDisplay.querySelectorAll('.sentence').forEach((el, i) => {
             el.classList.remove('current', 'previous', 'visible');
-            if (index < currentIndex) el.classList.add('previous', 'visible');
-            else if (index === currentIndex) el.classList.add('current', 'visible');
+            if (i < currentIndex) el.classList.add('previous', 'visible');
+            else if (i === currentIndex) el.classList.add('current', 'visible');
         });
-        const currentSentence = passageDisplay.querySelector('.sentence.current');
-        if (currentSentence) currentSentence.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const current = passageDisplay.querySelector('.sentence.current');
+        if (current) current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    function ensureStartStyles() {
-        if (document.getElementById('start-prompt-style')) return;
-        const style = document.createElement('style');
-        style.id = 'start-prompt-style';
-        style.textContent = `
-        .start-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);display:flex;justify-content:center;align-items:center;z-index:9998}
-        .start-card{background:#fff;border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,0.15);padding:32px 28px;width:min(600px,92%);text-align:left;font-family:Pretendard,system-ui,sans-serif}
-        .start-title{font-size:24px;font-weight:700;color:#333;margin:0 0 20px 0;text-align:center}
-        .instruction-list{list-style:none;padding:0;margin:0 0 16px 0}
-        .instruction-list li{font-size:14px;color:#555;margin:0 0 8px 0;padding:4px 0;line-height:1.4}
-        .start-btn{display:block;background:#42A5F5;color:#fff;border:none;border-radius:14px;padding:14px 24px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(66,165,245,0.3);margin:0 auto;font-size:16px}
-        .start-btn:hover{background:#1E88E5;transform:translateY(-1px)}
-        `;
-        document.head.appendChild(style);
-    }
-
-    function showStartPrompt() {
-        ensureStartStyles();
-        const overlay = document.createElement('div');
-        overlay.className = 'start-overlay';
-        overlay.innerHTML = `
-            <div class="start-card">
-                <h3 class="start-title">지문 읽기 안내</h3>
-                <ul class="instruction-list">
-                    <li>🎤 <strong>마이크 버튼</strong>을 눌러서 읽기를 시작하세요</li>
-                    <li>📝 문장을 <strong>소리내어 읽어주세요</strong></li>
-                    <li>⏸️ 중간에 멈춰도 괜찮아요</li>
-                    <li>✅ 다 읽으면 <strong>다음 문장</strong>으로 넘어갑니다</li>
-                </ul>
-                <button class="start-btn">시작하기</button>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-        const startBtn = overlay.querySelector('.start-btn');
-        startBtn.addEventListener('click', () => {
-            overlay.remove();
-            showNextSentence();
-        });
-    }
-
-    // --- 녹음 및 STT 로직 ---
     function toggleRecording() {
         if (isRecording) {
             stopRecording();
@@ -204,63 +161,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startRecording() {
         if (!mediaStream) return;
-        if (socket) {
-            try { if (socket.readyState === WebSocket.OPEN) socket.close(1000, '새 연결'); } catch {}
-            socket = null;
-        }
+
+        if (socket && socket.readyState === WebSocket.OPEN) socket.close(1000, '새 연결');
         isRecording = true;
         micBtn.classList.add('recording');
         recordingAnimation.classList.add('active');
         updateFeedbackMessage("읽는 중...");
-        retryBtn.classList.remove('active');
         accumulatedText = '';
         updateVoiceText("음성을 인식하는 중...");
 
-        if (silenceTimeout) clearTimeout(silenceTimeout);
         socket = new WebSocket(STT_URL);
 
         socket.onopen = () => {
-            mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'audio/webm', audioBitsPerSecond: 128000 });
-            mediaRecorder.ondataavailable = event => {
-                if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) socket.send(event.data);
+            mediaRecorder = new MediaRecorder(mediaStream, {
+                mimeType: 'audio/webm',
+                audioBitsPerSecond: 128000
+            });
+            mediaRecorder.ondataavailable = e => {
+                if (e.data.size > 0 && socket.readyState === WebSocket.OPEN) {
+                    socket.send(e.data);
+                }
             };
-            mediaRecorder.start(1000);
+            // ✅ 반응속도 개선 (1초 → 0.3초)
+            mediaRecorder.start(300);
         };
 
-        socket.onmessage = (event) => {
+        socket.onmessage = e => {
             try {
-                const data = JSON.parse(event.data);
-                if (data.type === 'transcript') {
-                    if (data.final && data.text?.trim()) {
-                        accumulatedText += ' ' + data.text.trim(); // ✅ 덮어쓰기 대신 누적
-                        updateVoiceText(accumulatedText.trim());
-                    } else if (data.text?.trim()) {
-                        // 중간 결과는 임시 표시용
+                const data = JSON.parse(e.data);
+                if (data.type === 'transcript' && data.text?.trim()) {
+                    // --- 실시간 표시 ---
+                    if (!data.final) {
                         updateVoiceText((accumulatedText + ' ' + data.text.trim()).trim());
+                    } else {
+                        accumulatedText += ' ' + data.text.trim();
+                        updateVoiceText(accumulatedText.trim());
                     }
 
+                    // --- 침묵 감지 후 자동 판정 (3초 + 80% 이상) ---
                     if (silenceTimeout) clearTimeout(silenceTimeout);
                     silenceTimeout = setTimeout(() => {
                         if (isRecording && accumulatedText.length > 0) {
-                            console.log('침묵 감지 - 녹음 유지');
+                            const original = sentences[currentIndex].trim();
+                            const lengthRatio = accumulatedText.length / original.length;
+                            if (lengthRatio >= 0.8) { // ✅ 80% 이상 읽었을 때 자동 평가
+                                stopRecording();
+                                checkSimilarity(accumulatedText.trim());
+                            }
                         }
-                    }, 8000); // ✅ 완화됨 (3초 → 8초)
+                    }, 3000);
                 }
-            } catch (error) {
-                console.error('WebSocket 메시지 오류:', error);
+            } catch (err) {
+                console.error('STT 메시지 오류:', err);
             }
         };
 
-        socket.onerror = () => onRecordingFail("서버 연결에 실패했습니다.");
-        socket.onclose = (e) => console.log('WebSocket 종료:', e.code, e.reason);
+        socket.onerror = () => onRecordingFail("서버 연결 실패");
+        socket.onclose = () => console.log("WebSocket 연결 종료");
 
         heartbeatInterval = setInterval(() => {
-            if (socket && socket.readyState === WebSocket.OPEN && isRecording) {
+            if (socket?.readyState === WebSocket.OPEN && isRecording)
                 socket.send(JSON.stringify({ type: 'heartbeat' }));
-            } else {
-                clearInterval(heartbeatInterval);
-                heartbeatInterval = null;
-            }
         }, 10000);
     }
 
@@ -270,24 +231,20 @@ document.addEventListener('DOMContentLoaded', () => {
         recordingAnimation.classList.remove('active');
         if (heartbeatInterval) clearInterval(heartbeatInterval);
         if (silenceTimeout) clearTimeout(silenceTimeout);
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            try { mediaRecorder.stop(); } catch {}
-        }
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            try { socket.close(1000, '정상 종료'); } catch {}
-        }
+        if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+        if (socket && socket.readyState === WebSocket.OPEN) socket.close(1000, '정상 종료');
         socket = null;
-        if (sentencePassed) updateFeedbackMessage("잘했어요! 👏");
-        else updateFeedbackMessage("다시 시도하기 버튼을 눌러주세요");
+        updateFeedbackMessage(sentencePassed ? "잘했어요! 👏" : "다시 시도하기 버튼을 눌러주세요");
     }
 
-    function normalizeText(text) {
-        return (text || '').toLowerCase().replace(/\s+/g, '').replace(/[.,!?"'`~:;\-()[\]{}…·]/g, '').replace(/\u200B/g, '');
+    function normalizeText(t) {
+        return (t || '').toLowerCase().replace(/\s+/g, '')
+            .replace(/[.,!?"'`~:;\-()[\]{}…·]/g, '').replace(/\u200B/g, '');
     }
 
     function levenshtein(a, b) {
         const m = a.length, n = b.length;
-        if (m === 0) return n; if (n === 0) return m;
+        if (m * n === 0) return Math.max(m, n);
         const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
         for (let i = 0; i <= m; i++) dp[i][0] = i;
         for (let j = 0; j <= n; j++) dp[0][j] = j;
@@ -302,44 +259,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function similarityRatio(a, b) {
         const maxLen = Math.max(a.length, b.length) || 1;
-        const dist = levenshtein(a, b);
-        return 1 - dist / maxLen;
+        return 1 - levenshtein(a, b) / maxLen;
     }
 
     function isSentenceComplete(original, spoken) {
-        if (spoken.length < 3) {
-            onRecordingFail("조금 더 길게 읽어주세요");
-            return false;
-        }
-        const lengthRatio = spoken.length / original.length;
-        if (lengthRatio < 0.6) {
-            onRecordingFail("문장을 끝까지 읽어주세요");
+        const ratio = spoken.length / original.length;
+        if (ratio < 0.8) { // ✅ 80% 기준 유지
+            onRecordingFail("문장을 거의 끝까지 읽어주세요.");
             return false;
         }
         return true;
     }
 
     function checkSimilarity(transcribedText) {
-        const originalSentence = sentences[currentIndex].trim();
-        const normOriginal = normalizeText(originalSentence);
-        const normSpoken = normalizeText(transcribedText);
-        if (!isSentenceComplete(normOriginal, normSpoken)) return;
-
-        const ratio = similarityRatio(normOriginal, normSpoken);
-        const containsPrefix = normOriginal.includes(normSpoken.slice(0, 4));
-        const pass = ratio >= 0.6 || containsPrefix;
-
+        const original = sentences[currentIndex].trim();
+        const normO = normalizeText(original);
+        const normS = normalizeText(transcribedText);
+        if (!isSentenceComplete(normO, normS)) return;
+        const ratio = similarityRatio(normO, normS);
+        const pass = ratio >= 0.6;
         if (pass) {
             updateFeedbackMessage("잘했어요! 👏");
             sentencePassed = true;
-            stopRecording();
             if (currentIndex === sentences.length - 1) doneBtn.disabled = false;
-            else setTimeout(() => showNextSentence(), 2000);
+            else setTimeout(showNextSentence, 1500);
         } else onRecordingFail("조금 다른 것 같아요. 다시 시도해볼까요?");
     }
 
-    function onRecordingFail(message) {
-        feedbackMessage.innerHTML = `😢 ${message}`;
+    function onRecordingFail(msg) {
+        feedbackMessage.textContent = `😢 ${msg}`;
         retryBtn.classList.add('active');
         updateVoiceText("인식 실패 - 다시 시도해주세요");
     }
@@ -347,6 +295,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function goBackToMain() {
         if (isRecording) stopRecording();
         window.location.href = 'main.html';
+    }
+
+    async function prefetchQuiz(fileId) {
+        try {
+            const res = await fetch(`${BASE_URL}/api/quiz`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fileId, level: '초급', style: '지문 이해' })
+            });
+            const data = await res.json();
+            if (data.ok && Array.isArray(data.questions))
+                sessionStorage.setItem(`quizCache:${fileId}`, JSON.stringify({ fileId, ...data }));
+        } catch {}
     }
 
     initialize();
